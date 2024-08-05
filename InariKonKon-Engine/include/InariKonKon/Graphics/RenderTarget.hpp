@@ -1,6 +1,7 @@
 #pragma once
 
 #include "InariKonKon/Utilities/Macros.hpp"
+#include "InariKonKon/Utilities/Color.hpp"
 
 namespace ikk
 {

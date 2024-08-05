@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "InariKonKon/Utilities/Color.hpp"
 #include "InariKonKon/Utilities/Macros.hpp"
 
 struct GLFWwindow;
