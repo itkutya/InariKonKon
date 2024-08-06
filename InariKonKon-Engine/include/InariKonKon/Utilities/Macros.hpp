@@ -1,7 +1,5 @@
 #pragma once
 
-#include <format>
-
 #define VERSION 1.01
 
 #ifdef _DEBUG

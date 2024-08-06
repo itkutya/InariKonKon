@@ -11,6 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\InariKonKon\Utilities\Clock.hpp" />
+    <ClInclude Include="include\InariKonKon\Utilities\Time.hpp" />
+    <ClInclude Include="include\InariKonKon\Window\Event.hpp" />
+    <ClInclude Include="include\InariKonKon\Window\EventManager.hpp" />
     <ClInclude Include="include\InariKonKon\Application\Application.hpp" />
     <ClInclude Include="include\InariKonKon\InariKonKon.hpp" />
     <ClInclude Include="include\InariKonKon\Utilities\Color.hpp" />
@@ -23,6 +27,9 @@
     <ClInclude Include="include\InariKonKon\Graphics\RenderTarget.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\InariKonKon\Utilites\Clock.cpp" />
+    <ClCompile Include="src\InariKonKon\Window\Event.cpp" />
+    <ClCompile Include="src\InariKonKon\Window\EventManager.cpp" />
     <ClCompile Include="external\glad\src\gl.c" />
     <ClCompile Include="src\InariKonKon\Graphics\RenderTarget.cpp" />
     <ClCompile Include="src\InariKonKon\InariKonKon.cpp" />

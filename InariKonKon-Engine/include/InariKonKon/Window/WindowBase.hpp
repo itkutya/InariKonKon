@@ -2,8 +2,10 @@
 
 #include <string>
 
-#include "InariKonKon/Utilities/Macros.hpp"
 #include "glm/vec2.hpp"
+
+#include "InariKonKon/Window/EventManager.hpp"
+#include "InariKonKon/Utilities/Macros.hpp"
 
 struct GLFWwindow;
 
@@ -47,17 +49,18 @@ namespace ikk
 		virtual void setTitle(const std::u8string& title) noexcept final;
 
 		[[nodiscard]] virtual const float getAspectRatio() const noexcept final;
-		//[[nodiscard]] const vec2u& getSize() const noexcept;
-		//void setSize(const vec2u size) noexcept;
+		[[nodiscard]] const glm::uvec2& getSize() const noexcept;
+		void setSize(const glm::uvec2 size) noexcept;
+	protected:
+		friend class Application;
+		[[nodiscard]] virtual const EventManager& getEventManager() const noexcept;
+		[[nodiscard]] virtual EventManager& getEventManager() noexcept;
 	private:
 		std::u8string m_title;
 		WindowBase::Settings m_settings;
 		GLFWwindow* m_window = nullptr;
-		/*
-		friend class Application;
-		[[nodiscard]] const std::queue<Event>& getEventQueue() const noexcept;
-		[[nodiscard]] std::queue<Event>& getEventQueue() noexcept;
-		*/
+
+		EventManager m_eventManager{};
 
 		GLFWwindow* const create(const std::u8string& title) const noexcept;
 		void initWindowEvents() noexcept;

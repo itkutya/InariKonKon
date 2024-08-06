@@ -2,7 +2,6 @@
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
-#include "glad/gl.h"
 
 #include "InariKonKon/Utilities/Log.hpp"
 
@@ -73,6 +72,27 @@ namespace ikk
 		return static_cast<float>(this->m_settings.size.x) / static_cast<float>(this->m_settings.size.y);
 	}
 
+	const glm::uvec2& WindowBase::getSize() const noexcept
+	{
+		return this->m_settings.size;
+	}
+
+	void WindowBase::setSize(const glm::uvec2 size) noexcept
+	{
+		this->m_settings.size = size;
+		glfwSetWindowSize(this->m_window, size.x, size.y);
+	}
+
+	const EventManager& WindowBase::getEventManager() const noexcept
+	{
+		return this->m_eventManager;
+	}
+
+	EventManager& WindowBase::getEventManager() noexcept
+	{
+		return this->m_eventManager;
+	}
+
 	GLFWwindow* const WindowBase::create(const std::u8string& title) const noexcept
 	{
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -96,6 +116,7 @@ namespace ikk
 			{
 				WindowBase* handler = reinterpret_cast<WindowBase*>(glfwGetWindowUserPointer(window));
 				handler->setActive();
+				//handler->getEventManager().push({});
 			};
 		glfwSetFramebufferSizeCallback(this->m_window, framebuffer_size_callback);
 
@@ -103,11 +124,11 @@ namespace ikk
 			{
 				if (event == GLFW_CONNECTED)
 				{
-					// The monitor was connected
+					//handler->getEventManager().push({});
 				}
 				else if (event == GLFW_DISCONNECTED)
 				{
-					// The monitor was disconnected
+					//handler->getEventManager().push({});
 				}
 			};
 		glfwSetMonitorCallback(monitor_callback);
@@ -116,6 +137,7 @@ namespace ikk
 			{
 				WindowBase* handler = reinterpret_cast<WindowBase*>(glfwGetWindowUserPointer(window));
 				handler->setActive();
+				//handler->getEventManager().push({});
 			};
 		glfwSetKeyCallback(this->m_window, key_callback);
 	}
