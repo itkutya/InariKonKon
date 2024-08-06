@@ -3,6 +3,7 @@
 #include <string>
 
 #include "InariKonKon/Utilities/Macros.hpp"
+#include "glm/vec2.hpp"
 
 struct GLFWwindow;
 
@@ -11,7 +12,15 @@ namespace ikk
 	class IKK_API WindowBase
 	{
 	public:
-		WindowBase(const std::u8string& title) noexcept;
+		struct Settings final
+		{
+			glm::uvec2 size = { 0, 0 };
+			std::uint32_t fpslimit = 0;
+			bool vsync = true;
+			bool fullscreen = false;
+		};
+
+		WindowBase(const std::u8string& title, const WindowBase::Settings settings = {}) noexcept;
 
 		WindowBase(const WindowBase&) noexcept = default;
 		WindowBase(WindowBase&&) noexcept = default;
@@ -42,6 +51,7 @@ namespace ikk
 		//void setSize(const vec2u size) noexcept;
 	private:
 		std::u8string m_title;
+		WindowBase::Settings m_settings;
 		GLFWwindow* m_window = nullptr;
 		/*
 		friend class Application;
@@ -50,5 +60,6 @@ namespace ikk
 		*/
 
 		GLFWwindow* const create(const std::u8string& title) const noexcept;
+		void initWindowEvents() noexcept;
 	};
 }

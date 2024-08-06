@@ -2,7 +2,7 @@
 
 namespace ikk
 {
-	Window::Window(const std::u8string& title) noexcept : WindowBase(title)
+	Window::Window(const std::u8string& title, const WindowBase::Settings settings) noexcept : WindowBase(title, settings)
 	{
 	}
 }

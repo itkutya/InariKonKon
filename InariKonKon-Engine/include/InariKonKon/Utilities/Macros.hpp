@@ -1,5 +1,9 @@
 #pragma once
 
+#include <format>
+
+#define VERSION 1.01
+
 #ifdef _DEBUG
 	#define IKK_DEBUG
 #else
@@ -28,4 +32,9 @@ static_assert(false, "This engine only supports windows!");
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4251)
+#endif
+
+#define EDITOR_MODE
+#ifdef EDITOR_MODE
+#define WINDOW_TITLE reinterpret_cast<const char8_t*>(std::format("InariKonKon - Editor v{0:.2f}", VERSION).c_str())
 #endif

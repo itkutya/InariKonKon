@@ -14,6 +14,6 @@ namespace ikk
 
 		void run() noexcept;
 	private:
-		Window m_window{ u8"Title" };
+		Window m_window{ WINDOW_TITLE };
 	};
 }

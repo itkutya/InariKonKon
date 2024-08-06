@@ -8,7 +8,7 @@ namespace ikk
 	class IKK_API Window final : public WindowBase, public RenderTarget
 	{
 	public:
-		Window(const std::u8string& title) noexcept;
+		Window(const std::u8string& title, const WindowBase::Settings settings = {}) noexcept;
 
 		Window(const Window&) noexcept = default;
 		Window(Window&&) noexcept = default;
