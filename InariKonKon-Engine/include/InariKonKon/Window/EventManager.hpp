@@ -10,6 +10,16 @@ namespace ikk
 	class IKK_API EventManager final
 	{
 	public:
+		EventManager() noexcept = default;
+
+		EventManager(const EventManager&) noexcept = default;
+		EventManager(EventManager&&) noexcept = default;
+
+		EventManager& operator=(const EventManager&) noexcept = default;
+		EventManager& operator=(EventManager&&) noexcept = default;
+
+		~EventManager() noexcept = default;
+
 		void push(Event&& event) noexcept;
 		void pop() noexcept;
 

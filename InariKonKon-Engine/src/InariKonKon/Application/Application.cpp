@@ -1,6 +1,7 @@
 #include "InariKonKon/Application/Application.hpp"
 
 #include <thread>
+#include <print>
 
 namespace ikk
 {

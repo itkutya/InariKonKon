@@ -9,6 +9,15 @@ namespace ikk
 {
 	WindowBase::WindowBase(const std::u8string& title, const WindowBase::Settings settings) noexcept : m_title(title), m_settings(settings), m_window(this->create(title))
 	{
+		if (this->m_window == nullptr)
+			Log::push("Could not initialize window!", Log::Level::Fatal);
+
+		this->setActive();
+
+		this->setFPSLimit(settings.fpslimit);
+		this->setVSync(settings.vsync);
+
+		this->initWindowEvents();
 	}
 
 	const bool WindowBase::shouldClose() const noexcept
@@ -18,6 +27,10 @@ namespace ikk
 
 	void WindowBase::setActive(const bool active) const noexcept
 	{
+		if (active)
+			glfwMakeContextCurrent(this->m_window);
+		else
+			glfwMakeContextCurrent(nullptr);
 	}
 
 	void WindowBase::handleEvents() const noexcept
@@ -95,10 +108,6 @@ namespace ikk
 
 	GLFWwindow* const WindowBase::create(const std::u8string& title) const noexcept
 	{
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
 		return glfwCreateWindow(500, 500, reinterpret_cast<const char*>(title.c_str()), NULL, NULL);
 	}
 
@@ -112,11 +121,17 @@ namespace ikk
 			};
 		glfwSetErrorCallback(errorCallback);
 
+		static auto window_close_callback = [](GLFWwindow* window) noexcept
+			{
+				WindowBase* handler = reinterpret_cast<WindowBase*>(glfwGetWindowUserPointer(window));
+				handler->getEventManager().push(Event{ Event::WindowClosed{} });
+			};
+		glfwSetWindowCloseCallback(this->m_window, window_close_callback);
+
 		static auto framebuffer_size_callback = [](GLFWwindow* window, int width, int height) noexcept
 			{
 				WindowBase* handler = reinterpret_cast<WindowBase*>(glfwGetWindowUserPointer(window));
-				handler->setActive();
-				//handler->getEventManager().push({});
+				handler->getEventManager().push(Event{ Event::FrameBufferResized{ static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height) } });
 			};
 		glfwSetFramebufferSizeCallback(this->m_window, framebuffer_size_callback);
 

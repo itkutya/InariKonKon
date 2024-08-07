@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\InariKonKon\Utilites\Clock.cpp" />
-    <ClCompile Include="src\InariKonKon\Window\Event.cpp" />
     <ClCompile Include="src\InariKonKon\Window\EventManager.cpp" />
     <ClCompile Include="external\glad\src\gl.c" />
     <ClCompile Include="src\InariKonKon\Graphics\RenderTarget.cpp" />
