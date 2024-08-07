@@ -7,8 +7,8 @@ int main()
 {
 	try
 	{
-		ikk::Application::createInstance();
-		ikk::Application::getInstance().run();
+		ikk::Application app{};
+		app.run();
 	}
 	catch (const std::exception& e)
 	{

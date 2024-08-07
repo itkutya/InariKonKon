@@ -10,29 +10,12 @@ namespace ikk
 	public:
 		virtual ~Singleton() noexcept = default;
 
-		inline static void createInstance() noexcept
-		{
-			static T instance;
-			ptr = &instance;
-		}
-
-		[[nodiscard]] inline static const T& getConstInstance() noexcept
-		{
-			if (ptr == nullptr)
-				createInstance();
-			return *ptr;
-		}
-
 		[[nodiscard]] inline static T& getInstance() noexcept
 		{
-			if (ptr == nullptr)
-				createInstance();
-			return *ptr;
+			static T instance{};
+			return instance;
 		}
-	private:
-		inline static T* ptr = nullptr;
-
+	protected:
 		Singleton() noexcept = default;
-		friend T;
 	};
 }

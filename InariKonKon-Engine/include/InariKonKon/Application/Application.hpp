@@ -1,23 +1,34 @@
 #pragma once
 
-#include <format>
-
-#include "InariKonKon/Utilities/Singleton.hpp"
 #include "InariKonKon/Utilities/Clock.hpp"
 #include "InariKonKon/Window/Window.hpp"
 
 namespace ikk
 {
-	class IKK_API Application final : public Singleton<Application>
+	class IKK_API Application final
 	{
-		friend class Singleton<Application>;
-		Application() noexcept = default;
+		struct Engine
+		{
+			~Engine() noexcept;
+
+			static const Engine init() noexcept;
+		};
 	public:
+		Application() noexcept;
+
+		Application(const Application&) noexcept = default;
+		Application(Application&&) noexcept = default;
+
+		Application& operator=(const Application&) noexcept = default;
+		Application& operator=(Application&&) noexcept = default;
+
 		~Application() noexcept = default;
 
 		void run() noexcept;
 	private:
-		Window m_window{ WINDOW_TITLE };
+		Engine m_engine;
+		Window m_window;
+
 		Clock m_clock{};
 
 		void handleEvents() noexcept;

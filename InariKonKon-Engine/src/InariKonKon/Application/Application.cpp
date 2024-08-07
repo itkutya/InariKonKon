@@ -1,10 +1,30 @@
 #include "InariKonKon/Application/Application.hpp"
 
 #include <thread>
-#include <print>
+
+#define GLFW_INCLUDE_NONE
+#include "GLFW/glfw3.h"
+
+#include "InariKonKon/Utilities/Log.hpp"
 
 namespace ikk
 {
+	Application::Engine::~Engine() noexcept
+	{
+		glfwTerminate();
+	}
+
+	const Application::Engine Application::Engine::init() noexcept
+	{
+		if (glfwInit() == GLFW_FALSE)
+			Log::push("Cannot initialize GLFW!", Log::Level::Fatal);
+		return {};
+	}
+
+	Application::Application() noexcept : m_engine(Application::Engine::init()), m_window(WINDOW_TITLE)
+	{
+	}
+
 	void Application::run() noexcept
 	{
 		this->m_clock.restart();

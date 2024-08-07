@@ -16,7 +16,7 @@ namespace ikk
 	public:
 		struct Settings final
 		{
-			glm::uvec2 size = { 0, 0 };
+			glm::uvec2 size = { 500, 600 };
 			std::uint32_t fpslimit = 0;
 			bool vsync = true;
 			bool fullscreen = false;
@@ -30,11 +30,9 @@ namespace ikk
 		WindowBase& operator=(const WindowBase&) noexcept = default;
 		WindowBase& operator=(WindowBase&&) noexcept = default;
 
-		virtual ~WindowBase() noexcept = default;
+		virtual ~WindowBase() noexcept;
 
 		[[nodiscard]] virtual const bool shouldClose() const noexcept final;
-
-		virtual void setActive(const bool active = true) const noexcept final;
 
 		virtual void handleEvents() const noexcept final;
 		virtual void display() const noexcept final;
@@ -62,7 +60,7 @@ namespace ikk
 
 		EventManager m_eventManager{};
 
-		GLFWwindow* const create(const std::u8string& title) const noexcept;
+		GLFWwindow* const create(const std::u8string& title, const WindowBase::Settings settings) const noexcept;
 		void initWindowEvents() noexcept;
 	};
 }

@@ -43,10 +43,10 @@ namespace ikk
 		temp += comment;
 
 		if (std::to_underlying(level) <= std::to_underlying(s_level) || contains(flags, Log::Flags::ForcePrintToConsole))
-			std::print("{}", temp);
+			std::print("{}\n", temp);
 
 		if (level == Log::Level::Fatal)
-			assert(false && "Fatal erro has occured! See logs to get more information...");
+			assert(false && "Fatal error has occured! See logs to get more information...");
 	}
 
 	void Log::setLevel(const Log::Level level) noexcept

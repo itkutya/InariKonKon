@@ -1,18 +1,27 @@
 #include "InariKonKon/Window/WindowBase.hpp"
 
+#include <format>
+
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
 #include "InariKonKon/Utilities/Log.hpp"
+#include "InariKonKon/Graphics/OpenGL.hpp"
 
 namespace ikk
 {
-	WindowBase::WindowBase(const std::u8string& title, const WindowBase::Settings settings) noexcept : m_title(title), m_settings(settings), m_window(this->create(title))
+	WindowBase::WindowBase(const std::u8string& title, const WindowBase::Settings settings) noexcept
+		: m_title(title), m_settings(settings), m_window(this->create(title, settings))
 	{
 		if (this->m_window == nullptr)
 			Log::push("Could not initialize window!", Log::Level::Fatal);
 
-		this->setActive();
+		glfwMakeContextCurrent(this->m_window);
+
+		if (gladLoadGLContext(Context::getInstance().getContext(), glfwGetProcAddress) == false)
+			Log::push("Could not initialize OpenGL!", Log::Level::Fatal);
+
+		gl->Viewport(0, 0, settings.size.x, settings.size.y);
 
 		this->setFPSLimit(settings.fpslimit);
 		this->setVSync(settings.vsync);
@@ -20,28 +29,24 @@ namespace ikk
 		this->initWindowEvents();
 	}
 
+	WindowBase::~WindowBase() noexcept
+	{
+		if (this->m_window)
+			glfwDestroyWindow(this->m_window);
+	}
+
 	const bool WindowBase::shouldClose() const noexcept
 	{
 		return glfwWindowShouldClose(this->m_window);
 	}
 
-	void WindowBase::setActive(const bool active) const noexcept
-	{
-		if (active)
-			glfwMakeContextCurrent(this->m_window);
-		else
-			glfwMakeContextCurrent(nullptr);
-	}
-
 	void WindowBase::handleEvents() const noexcept
 	{
-		this->setActive();
 		glfwPollEvents();
 	}
 
 	void WindowBase::display() const noexcept
 	{
-		this->setActive();
 		glfwSwapBuffers(this->m_window);
 	}
 
@@ -106,9 +111,13 @@ namespace ikk
 		return this->m_eventManager;
 	}
 
-	GLFWwindow* const WindowBase::create(const std::u8string& title) const noexcept
+	GLFWwindow* const WindowBase::create(const std::u8string& title, const WindowBase::Settings settings) const noexcept
 	{
-		return glfwCreateWindow(500, 500, reinterpret_cast<const char*>(title.c_str()), NULL, NULL);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+		return glfwCreateWindow(settings.size.x, settings.size.y, reinterpret_cast<const char*>(title.c_str()), NULL, NULL);
 	}
 
 	void WindowBase::initWindowEvents() noexcept
@@ -117,7 +126,7 @@ namespace ikk
 
 		static auto errorCallback = [](int id, const char* description) noexcept
 			{
-				Log::push(std::format("ERROR ({}): {}", id, description).c_str(), Log::Level::Error);
+				Log::push(std::format("(id: {}): {}", id, description).c_str(), Log::Level::Error);
 			};
 		glfwSetErrorCallback(errorCallback);
 
@@ -132,28 +141,8 @@ namespace ikk
 			{
 				WindowBase* handler = reinterpret_cast<WindowBase*>(glfwGetWindowUserPointer(window));
 				handler->getEventManager().push(Event{ Event::FrameBufferResized{ static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height) } });
+				gl->Viewport(0, 0, width, height);
 			};
 		glfwSetFramebufferSizeCallback(this->m_window, framebuffer_size_callback);
-
-		static auto monitor_callback = [](GLFWmonitor* monitor, int event) noexcept
-			{
-				if (event == GLFW_CONNECTED)
-				{
-					//handler->getEventManager().push({});
-				}
-				else if (event == GLFW_DISCONNECTED)
-				{
-					//handler->getEventManager().push({});
-				}
-			};
-		glfwSetMonitorCallback(monitor_callback);
-
-		static auto key_callback = [](GLFWwindow* window, int key, int scancode, int action, int mods) noexcept
-			{
-				WindowBase* handler = reinterpret_cast<WindowBase*>(glfwGetWindowUserPointer(window));
-				handler->setActive();
-				//handler->getEventManager().push({});
-			};
-		glfwSetKeyCallback(this->m_window, key_callback);
 	}
 }

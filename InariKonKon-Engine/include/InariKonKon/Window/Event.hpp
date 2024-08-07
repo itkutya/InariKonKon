@@ -7,8 +7,9 @@
 
 namespace ikk
 {
-	struct IKK_API Event final
+	class IKK_API Event final
 	{
+	public:
 		struct WindowClosed final
 		{
 		};
