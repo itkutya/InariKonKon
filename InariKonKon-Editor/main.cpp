@@ -3,6 +3,8 @@
 #include <exception>
 #include <print>
 
+#include "InariKonKon/EditorScene.hpp"
+
 int main()
 {
 	try

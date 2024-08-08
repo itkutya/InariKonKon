@@ -27,8 +27,12 @@
     <ClInclude Include="include\InariKonKon\Window\WindowBase.hpp" />
     <ClInclude Include="include\InariKonKon\Window\Window.hpp" />
     <ClInclude Include="include\InariKonKon\Graphics\RenderTarget.hpp" />
+    <ClInclude Include="include\InariKonKon\Application\SceneManager.hpp" />
+    <ClInclude Include="include\InariKonKon\Application\Scene.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\InariKonKon\Application\Scene.cpp" />
+    <ClCompile Include="src\InariKonKon\Application\SceneManager.cpp" />
     <ClCompile Include="src\InariKonKon\Window\Context.cpp" />
     <ClCompile Include="src\InariKonKon\Utilites\Clock.cpp" />
     <ClCompile Include="src\InariKonKon\Window\EventManager.cpp" />

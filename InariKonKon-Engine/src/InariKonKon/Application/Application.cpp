@@ -1,6 +1,7 @@
 #include "InariKonKon/Application/Application.hpp"
 
 #include <thread>
+#include <format>
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
@@ -21,7 +22,7 @@ namespace ikk
 		return {};
 	}
 
-	Application::Application() noexcept : m_engine(Application::Engine::init()), m_window(WINDOW_TITLE)
+	Application::Application() noexcept : m_engine(Application::Engine::init()), m_window(EDITOR_WINDOW_TITLE)
 	{
 	}
 

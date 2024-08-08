@@ -16,7 +16,7 @@ namespace ikk
 	public:
 		struct Settings final
 		{
-			glm::uvec2 size = { 500, 600 };
+			glm::uvec2 size = { 1024, 800 };
 			std::uint32_t fpslimit = 0;
 			bool vsync = true;
 			bool fullscreen = false;

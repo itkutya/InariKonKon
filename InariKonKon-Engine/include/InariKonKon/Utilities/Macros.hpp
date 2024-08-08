@@ -32,7 +32,4 @@ static_assert(false, "This engine only supports windows!");
 #pragma warning(disable : 4251)
 #endif
 
-#define EDITOR_MODE
-#ifdef EDITOR_MODE
-#define WINDOW_TITLE reinterpret_cast<const char8_t*>(std::format("InariKonKon - Editor v{0:.2f}", VERSION).c_str())
-#endif
+#define EDITOR_WINDOW_TITLE reinterpret_cast<const char8_t*>(std::format("InariKonKon - Editor v{0:.2f}", VERSION).c_str())
