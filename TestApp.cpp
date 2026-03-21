@@ -40,7 +40,7 @@ private:
 
 int main()
 {
-    ikk::Application app{ u8"TestApp 生", 800, 600, ikk::Renderer::Type::Vulkan };
+    ikk::Application app{ u8"TestApp 生", 800, 600 };
     app.attach(MenuLayer{});
     app.run();
     return 0;

@@ -1,8 +1,8 @@
 module;
 
 #include <string_view>
+#include <utility>
 #include <cstdint>
-#include <memory>
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
@@ -20,7 +20,7 @@ export namespace ikk
     class [[nodiscard]] Window final
     {
     public:
-        [[nodiscard]] Window(std::u8string_view title, std::uint32_t width, std::uint32_t height, Renderer::Type type) noexcept;
+        [[nodiscard]] Window(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept;
 
         Window(const Window& other) noexcept;
         Window(Window&& other) noexcept;
@@ -34,12 +34,11 @@ export namespace ikk
 
         void pollEvents() const noexcept;
 
-        [[nodiscard]] const std::shared_ptr<Renderer>& getRenderer() const noexcept;
+        [[nodiscard]] const Renderer& getRenderer() const noexcept;
     private:
         GLFWwindow* m_window = nullptr;
 
-        std::shared_ptr<Renderer> m_renderer = nullptr;
-        Renderer::Type m_type = Renderer::Type::None;
+        Renderer m_renderer;
 
         void setupWindow() noexcept;
     };
@@ -47,21 +46,15 @@ export namespace ikk
 
 namespace ikk
 {
-    Window::Window(std::u8string_view title, std::uint32_t width, std::uint32_t height, Renderer::Type type) noexcept
-        : m_type(type)
+    Window::Window(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept
     {
         if (glfwInit() == GLFW_FALSE)
             return;
 
-        switch (this->m_type)
-        {
-        case Renderer::Type::None: return;
-        case Renderer::Type::Vulkan:
-            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-            break;
-        }
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
         this->m_window = glfwCreateWindow(I32(width), I32(height), reinterpret_cast<const char*>(title.data()), nullptr, nullptr);
+        this->m_renderer.create<Vulkan>(this->m_window);
         this->setupWindow();
     }
 
@@ -73,20 +66,14 @@ namespace ikk
             int width, height;
             glfwGetWindowSize(other.m_window, &width, &height);
             this->m_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-            this->m_type = other.m_type;
+            this->m_renderer.create<Vulkan>(this->m_window);
             this->setupWindow();
         }
     }
 
     Window::Window(Window&& other) noexcept
+        : m_window(std::exchange(other.m_window, nullptr)), m_renderer(std::move(other.m_renderer))
     {
-        if (this != &other)
-        {
-            this->m_window = other.m_window;
-            this->m_type = other.m_type;
-            other.m_window = nullptr;
-            other.m_type = Renderer::Type::None;
-        }
     }
 
     Window& Window::operator=(const Window& other) noexcept
@@ -100,7 +87,7 @@ namespace ikk
             int width, height;
             glfwGetWindowSize(other.m_window, &width, &height);
             this->m_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-            this->m_type = other.m_type;
+            this->m_renderer.create<Vulkan>(this->m_window);
             this->setupWindow();
         }
         return *this;
@@ -113,10 +100,8 @@ namespace ikk
             if (this->m_window != nullptr)
                 glfwDestroyWindow(this->m_window);
 
-            this->m_window = other.m_window;
-            this->m_type = other.m_type;
-            other.m_window = nullptr;
-            other.m_type = Renderer::Type::None;
+            this->m_window = std::exchange(other.m_window, nullptr);
+            this->m_renderer = std::move(other.m_renderer);
         }
         return *this;
     }
@@ -125,6 +110,7 @@ namespace ikk
     {
         if (this->m_window != nullptr)
             glfwDestroyWindow(this->m_window);
+        glfwTerminate();
     }
 
     bool Window::shouldClose() const noexcept
@@ -138,7 +124,7 @@ namespace ikk
             glfwPollEvents();
     }
 
-    const std::shared_ptr<Renderer>& Window::getRenderer() const noexcept
+    const Renderer& Window::getRenderer() const noexcept
     {
         return this->m_renderer;
     }
@@ -147,14 +133,6 @@ namespace ikk
     {
         if (this->m_window == nullptr)
             return;
-
-        switch (this->m_type)
-        {
-        case Renderer::Type::None: return;
-        case Renderer::Type::Vulkan:
-            this->m_renderer = std::make_shared<Vulkan>(this->m_window);
-            break;
-        }
 
         glfwSetWindowUserPointer(this->m_window, this);
 

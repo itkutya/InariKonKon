@@ -14,25 +14,25 @@ import Utility;
 
 export namespace ikk
 {
-    class Vulkan final : public Renderer
+    class Vulkan final : public Renderer::Type
     {
     public:
         explicit Vulkan(GLFWwindow* window) noexcept;
 
-        Vulkan(const Vulkan&) noexcept = delete;
+        Vulkan(const Vulkan&) noexcept = default;
         Vulkan(Vulkan&&) noexcept = default;
 
-        Vulkan& operator=(const Vulkan&) noexcept = delete;
+        Vulkan& operator=(const Vulkan&) noexcept = default;
         Vulkan& operator=(Vulkan&&) noexcept = default;
 
-        ~Vulkan() noexcept = default;
+        ~Vulkan() noexcept;
 
         [[nodiscard]] bool isValid() const noexcept override;
     private:
         bool m_valid = false;
 
-        vk::UniqueInstance m_instance;
-        vk::UniqueSurfaceKHR m_surface;
+        vk::Instance m_instance;
+        vk::SurfaceKHR m_surface;
     };
 }
 
@@ -40,52 +40,55 @@ namespace ikk
 {
     Vulkan::Vulkan(GLFWwindow* window) noexcept
     {
-        this->m_valid = false;
-
         if (glfwVulkanSupported() == GLFW_FALSE)
             return;
 
         //TODO: Init vulkan stuff...
         const char* appName = glfwGetWindowTitle(window);
         const vk::ApplicationInfo appInfo
-            {
-                .pApplicationName = appName,
-                .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-                .pEngineName = "InariKonKon",
-                .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-                .apiVersion = VK_API_VERSION_1_4
-            };
+        {
+            .pApplicationName = appName,
+            .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+            .pEngineName = "InariKonKon",
+            .engineVersion = VK_MAKE_VERSION(1, 0, 0),
+            .apiVersion = VK_API_VERSION_1_4
+        };
 
         std::uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-        const std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
-        vk::InstanceCreateInfo createInfo
-            {
-                .pApplicationInfo = &appInfo,
-                .enabledExtensionCount = static_cast<std::uint32_t>(extensions.size()),
-                .ppEnabledExtensionNames = extensions.data()
-            };
-        //TODO: Can't find VK_LAYER_KHRONOS_validation
+        const auto availableLayers = vk::enumerateInstanceLayerProperties();
+
         const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
-        if constexpr (isDebug())
+        const vk::InstanceCreateInfo createInfo
         {
-            createInfo.enabledExtensionCount = static_cast<std::uint32_t>(validationLayers.size());
-            createInfo.ppEnabledLayerNames = validationLayers.data();
-        }
+            .pApplicationInfo = &appInfo,
+            .enabledLayerCount = U32(validationLayers.size()),
+            .ppEnabledLayerNames = validationLayers.data(),
+            .enabledExtensionCount = glfwExtensionCount,
+            .ppEnabledExtensionNames = glfwExtensions
+        };
 
-        this->m_instance = vk::createInstanceUnique(createInfo);
-        if (!this->m_instance)
+        if (vk::createInstance(&createInfo, nullptr, &m_instance) != vk::Result::eSuccess)
             return;
 
-        VkSurfaceKHR tempSurface;
-        if (glfwCreateWindowSurface(this->m_instance.get(), window, nullptr, &tempSurface) != VK_SUCCESS)
+        VkSurfaceKHR rawSurface{};
+        if (glfwCreateWindowSurface(static_cast<VkInstance>(m_instance), window, nullptr, &rawSurface) != VK_SUCCESS)
             return;
-        this->m_surface = vk::UniqueSurfaceKHR(tempSurface, this->m_instance.get());
 
-
+        m_surface = rawSurface;
 
         this->m_valid = true;
+    }
+
+    Vulkan::~Vulkan() noexcept
+    {
+        if (this->m_instance)
+        {
+            if (this->m_surface)
+                this->m_instance.destroySurfaceKHR(this->m_surface);
+            this->m_instance.destroy();
+        }
     }
 
     bool Vulkan::isValid() const noexcept

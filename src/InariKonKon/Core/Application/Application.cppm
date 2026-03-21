@@ -24,7 +24,7 @@ export namespace ikk
     {
     public:
         //TODO: Application should have a different constructor then window...
-        [[nodiscard]] Application(std::u8string_view title, std::uint32_t width, std::uint32_t height, Renderer::Type type) noexcept;
+        [[nodiscard]] Application(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept;
 
         Application(const Application&) noexcept = default;
         Application(Application&&) noexcept = default;
@@ -32,7 +32,7 @@ export namespace ikk
         Application& operator=(const Application&) noexcept = default;
         Application& operator=(Application&&) noexcept = default;
 
-        ~Application() noexcept;
+        ~Application() noexcept = default;
 
         void run() noexcept;
 
@@ -54,21 +54,15 @@ export namespace ikk
 
 namespace ikk
 {
-    Application::Application(std::u8string_view title, std::uint32_t width, std::uint32_t height, Renderer::Type type) noexcept
-        : m_window(title, width, height, type)
+    Application::Application(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept
+        : m_window(title, width, height)
     {
         this->m_deltaTime.restart();
     }
 
-    Application::~Application() noexcept
-    {
-        //TODO: Window destroyed after glfwTerminate is called...
-        //glfwTerminate();
-    }
-
     void Application::run() noexcept
     {
-        while (this->m_window.shouldClose() == false && this->m_window.getRenderer()->isValid() == true)
+        while (this->m_window.shouldClose() == false && this->m_window.getRenderer().isValid() == true)
         {
             this->processEvents();
             this->update();
