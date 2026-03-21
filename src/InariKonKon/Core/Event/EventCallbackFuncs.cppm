@@ -16,6 +16,7 @@ import InputManager;
 import Conversion;
 import Utility;
 import Input;
+import Log;
 import Vec;
 
 export namespace ikk
@@ -71,6 +72,7 @@ namespace ikk
 {
     void EventCallbackFuncs::errorCallback(int code, const char* description) noexcept
     {
+        Print<Log::Level::Error>("code: {}, description: {}", code, description);
     }
 
     void EventCallbackFuncs::windowClosedCallback(GLFWwindow* window) noexcept

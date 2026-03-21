@@ -20,7 +20,9 @@ FetchContent_MakeAvailable(glfw)
 FetchContent_Declare(fmt GIT_REPOSITORY https://github.com/fmtlib/fmt.git GIT_TAG master)
 FetchContent_MakeAvailable(fmt)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt)
+find_package(Vulkan REQUIRED)
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt Vulkan::Vulkan)
 
 add_executable(TestApp TestApp.cpp)
 target_link_libraries(TestApp InariKonKonGameFramework)

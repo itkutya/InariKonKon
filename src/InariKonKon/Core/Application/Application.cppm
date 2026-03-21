@@ -11,6 +11,7 @@ module;
 export module Core:Application;
 
 import :EventManager;
+import :Renderer;
 import :Window;
 import :Layer;
 
@@ -22,7 +23,8 @@ export namespace ikk
     class [[nodiscard]] Application final
     {
     public:
-        [[nodiscard]] Application(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept;
+        //TODO: Application should have a different constructor then window...
+        [[nodiscard]] Application(std::u8string_view title, std::uint32_t width, std::uint32_t height, Renderer::Type type) noexcept;
 
         Application(const Application&) noexcept = default;
         Application(Application&&) noexcept = default;
@@ -52,20 +54,21 @@ export namespace ikk
 
 namespace ikk
 {
-    Application::Application(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept
-        : m_window(title, width, height)
+    Application::Application(std::u8string_view title, std::uint32_t width, std::uint32_t height, Renderer::Type type) noexcept
+        : m_window(title, width, height, type)
     {
         this->m_deltaTime.restart();
     }
 
     Application::~Application() noexcept
     {
-        glfwTerminate();
+        //TODO: Window destroyed after glfwTerminate is called...
+        //glfwTerminate();
     }
 
     void Application::run() noexcept
     {
-        while (!this->m_window.shouldClose())
+        while (this->m_window.shouldClose() == false && this->m_window.getRenderer()->isValid() == true)
         {
             this->processEvents();
             this->update();

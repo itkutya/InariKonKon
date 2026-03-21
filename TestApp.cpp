@@ -40,8 +40,7 @@ private:
 
 int main()
 {
-    int *x = new int(10);
-    ikk::Application app{ u8"TestApp 生", 800, 600 };
+    ikk::Application app{ u8"TestApp 生", 800, 600, ikk::Renderer::Type::Vulkan };
     app.attach(MenuLayer{});
     app.run();
     return 0;
