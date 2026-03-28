@@ -88,7 +88,7 @@ namespace ikk
     template<Log::Level level, Log::Flags flags>
     constexpr std::string_view BasicLogger<level, flags>::convertToString(Log::Level severety) noexcept
     {
-        switch (level)
+        switch (severety)
         {
             case Log::Level::Info:       return "INFO";
             case Log::Level::Warning:    return "WARNING";

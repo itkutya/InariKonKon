@@ -155,12 +155,12 @@ namespace ikk
             EventManager::getInstance().emplace(WindowEvent::CursorLeft{ .window = ptr });
     }
 
-    void EventCallbackFuncs::characterCallback(GLFWwindow* window, unsigned int codepoint) noexcept
+    void EventCallbackFuncs::characterCallback([[maybe_unused]] GLFWwindow* window, unsigned int codepoint) noexcept
     {
         EventManager::getInstance().emplace(InputEvent::Text{ .unicode = static_cast<char32_t>(codepoint) });
     }
 
-    void EventCallbackFuncs::keyInputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept
+    void EventCallbackFuncs::keyInputCallback([[maybe_unused]] GLFWwindow* window, int key, int scancode, int action, [[maybe_unused]] int mods) noexcept
     {
         //TODO: Fix later...
         if (auto& mapping = Keyboard::getScanCodeMapping(); mapping.contains(scancode) == false)
@@ -171,23 +171,23 @@ namespace ikk
         EventManager::getInstance().emplace(InputEvent::Keyboard{ .keycode = keycode, .scancode = scancode, .state = state });
     }
 
-    void EventCallbackFuncs::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) noexcept
+    void EventCallbackFuncs::mouseButtonCallback([[maybe_unused]] GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) noexcept
     {
         const Mouse::Button mButton = Conversion::fromGLFWButton(button);
         const Input::State state = Conversion::fromGLFWAction(action);
         EventManager::getInstance().emplace(InputEvent::Mouse::Button{ .button = mButton, .state = state });
     }
 
-    void EventCallbackFuncs::mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept
+    void EventCallbackFuncs::mouseScrollCallback([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) noexcept
     {
-        if (xoffset != 0)
+        if (xoffset != 0.0)
             EventManager::getInstance().emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Horizontal, .delta = xoffset });
 
-        if (yoffset != 0)
+        if (yoffset != 0.0)
             EventManager::getInstance().emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Vertical, .delta = yoffset });
     }
 
-    void EventCallbackFuncs::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) noexcept
+    void EventCallbackFuncs::cursorPositionCallback([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) noexcept
     {
         EventManager::getInstance().emplace(InputEvent::Mouse::Move{ .position = { xpos, ypos } });
     }
@@ -197,12 +197,12 @@ namespace ikk
         if (event == GLFW_CONNECTED)
         {
             EventManager::getInstance().emplace(InputEvent::Joystick::Connected{ .id = U32(jid) });
-            InputManager::getInstance().addJoystick(jid);
+            InputManager::getInstance().addJoystick(U32(jid));
         }
         else if (event == GLFW_DISCONNECTED)
         {
             EventManager::getInstance().emplace(InputEvent::Joystick::Disconnected{ .id = U32(jid) });
-            InputManager::getInstance().removeJoystick(jid);
+            InputManager::getInstance().removeJoystick(U32(jid));
         }
     }
 
