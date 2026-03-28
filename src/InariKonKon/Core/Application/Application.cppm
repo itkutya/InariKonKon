@@ -39,6 +39,7 @@ export namespace ikk
         template<LayerType T>
         void attach(T&& layer) noexcept;
 
+        //TODO:
         //void detach() noexcept;
     private:
         Window m_window;

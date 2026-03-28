@@ -37,8 +37,7 @@ export namespace ikk
         [[nodiscard]] const Renderer& getRenderer() const noexcept;
     private:
         GLFWwindow* m_window = nullptr;
-
-        Renderer m_renderer;
+        Renderer m_renderer{};
 
         void setupWindow() noexcept;
     };
@@ -51,6 +50,7 @@ namespace ikk
         if (glfwInit() == GLFW_FALSE)
             return;
 
+        //TODO:
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
         this->m_window = glfwCreateWindow(I32(width), I32(height), reinterpret_cast<const char*>(title.data()), nullptr, nullptr);
@@ -115,13 +115,13 @@ namespace ikk
 
     bool Window::shouldClose() const noexcept
     {
-        return this->m_window == nullptr || BOOL(glfwWindowShouldClose(this->m_window));
+        if (this->m_window == nullptr) return true;
+        return BOOL(glfwWindowShouldClose(this->m_window));
     }
 
     void Window::pollEvents() const noexcept
     {
-        if (this->m_window != nullptr)
-            glfwPollEvents();
+        if (this->m_window != nullptr) glfwPollEvents();
     }
 
     const Renderer& Window::getRenderer() const noexcept
@@ -131,17 +131,14 @@ namespace ikk
 
     void Window::setupWindow() noexcept
     {
-        if (this->m_window == nullptr)
-            return;
-
-        glfwSetWindowUserPointer(this->m_window, this);
+        if (this->m_window == nullptr) return;
 
         if (glfwRawMouseMotionSupported() == GLFW_TRUE)
             glfwSetInputMode(this->m_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
-        if constexpr (isDebug())
-            glfwSetErrorCallback(EventCallbackFuncs::errorCallback);
+        glfwSetWindowUserPointer(this->m_window, this);
 
+        if constexpr (isDebug()) glfwSetErrorCallback(EventCallbackFuncs::errorCallback);
         glfwSetWindowCloseCallback(this->m_window, EventCallbackFuncs::windowClosedCallback);
         glfwSetWindowSizeCallback(this->m_window, EventCallbackFuncs::windowResizeCallback);
         glfwSetFramebufferSizeCallback(this->m_window, EventCallbackFuncs::framebufferResizeCallback);
@@ -159,6 +156,6 @@ namespace ikk
         glfwSetWindowContentScaleCallback(this->m_window, EventCallbackFuncs::windowContentScaleCallback);
         glfwSetDropCallback(this->m_window, EventCallbackFuncs::dropCallback);
         glfwSetMonitorCallback(EventCallbackFuncs::monitorCallback);
-        glfwSetJoystickCallback(EventCallbackFuncs::joystickCallback); 
+        glfwSetJoystickCallback(EventCallbackFuncs::joystickCallback);
     }
 }
