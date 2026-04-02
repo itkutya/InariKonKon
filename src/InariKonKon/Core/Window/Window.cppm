@@ -33,6 +33,7 @@ export namespace ikk
         [[nodiscard]] bool shouldClose() const noexcept;
 
         void pollEvents() const noexcept;
+        void render(const Color& clearColor) const noexcept;
 
         [[nodiscard]] const Renderer& getRenderer() const noexcept;
     private:
@@ -122,6 +123,13 @@ namespace ikk
     void Window::pollEvents() const noexcept
     {
         if (this->m_window != nullptr) glfwPollEvents();
+    }
+
+    void Window::render(const Color& clearColor) const noexcept
+    {
+        this->m_renderer.beginRender(clearColor);
+        //TODO: Draw stuff here...
+        this->m_renderer.endRender();
     }
 
     const Renderer& Window::getRenderer() const noexcept

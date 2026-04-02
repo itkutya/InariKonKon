@@ -22,9 +22,9 @@ FetchContent_MakeAvailable(glfw)
 FetchContent_Declare(fmt GIT_REPOSITORY https://github.com/fmtlib/fmt.git GIT_TAG master)
 FetchContent_MakeAvailable(fmt)
 
-find_package(Vulkan REQUIRED)
+find_package(Vulkan REQUIRED shaderc_combined)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt Vulkan::Vulkan)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt Vulkan::Vulkan Vulkan::shaderc_combined)
 
 add_executable(TestApp TestApp.cpp)
 target_link_libraries(TestApp InariKonKonGameFramework)

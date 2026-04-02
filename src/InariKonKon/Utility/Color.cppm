@@ -1,0 +1,132 @@
+module;
+
+#include <cstdint>
+#include <limits>
+
+export module Color;
+
+import Utility;
+
+export namespace ikk
+{
+    //TODO:
+    struct [[nodiscard]] Color final
+    {
+        struct [[nodiscard]] Channel final
+        {
+            [[nodiscard]] constexpr Channel() noexcept = default;
+            [[nodiscard]] constexpr Channel(std::uint8_t value) noexcept;
+            //[[nodiscard]] constexpr Channel(Clamped<float, 0.f, 1.f> value) noexcept;
+
+            constexpr Channel(const Channel&) noexcept = default;
+            constexpr Channel(Channel&&) noexcept = default;
+
+            constexpr Channel& operator=(const Channel&) noexcept = default;
+            constexpr Channel& operator=(Channel&&) noexcept = default;
+
+            constexpr ~Channel() noexcept = default;
+
+            [[nodiscard]] constexpr operator float() const noexcept;
+            [[nodiscard]] constexpr operator std::uint8_t() const noexcept;
+
+            [[nodiscard]] constexpr float toFloat() const noexcept;
+            [[nodiscard]] constexpr std::uint8_t toUInt8() const noexcept;
+
+            std::uint8_t value = 0;
+        };
+
+        [[nodiscard]] constexpr Color() noexcept = default;
+        [[nodiscard]] constexpr Color(Channel r, Channel g, Channel b, Channel a = { 0xff }) noexcept;
+        [[nodiscard]] constexpr Color(std::uint32_t rgba) noexcept;
+
+        constexpr Color(const Color&) noexcept = default;
+        constexpr Color(Color&&) noexcept = default;
+
+        constexpr Color& operator=(const Color&) noexcept = default;
+        constexpr Color& operator=(Color&&) noexcept = default;
+
+        constexpr ~Color() noexcept = default;
+
+        [[nodiscard]] constexpr std::uint32_t toUInt32() const noexcept;
+
+        Channel r = {};
+        Channel g = {};
+        Channel b = {};
+        Channel a = { 0xff };
+
+        static const Color White;
+        static const Color Black;
+        static const Color Red;
+        static const Color Green;
+        static const Color Blue;
+        static const Color Yellow;
+        static const Color Magenta;
+        static const Color Cyan;
+        static const Color CornflowerBlue;
+        static const Color Transparent;
+
+        static const Color Miku;
+        static const Color Teto;
+        static const Color Rin;
+    };
+
+    //TODO: constexpr somehow...
+    const Color Color::White            { 0xff, 0xff, 0xff };
+    const Color Color::Black            { 0x00, 0x00, 0x00 };
+    const Color Color::Red              { 0xff, 0x00, 0x00 };
+    const Color Color::Green            { 0x00, 0xff, 0x00 };
+    const Color Color::Blue             { 0x00, 0x00, 0xff };
+    const Color Color::Yellow           { 0xff, 0xff, 0x00 };
+    const Color Color::Magenta          { 0xff, 0x00, 0xff };
+    const Color Color::Cyan             { 0x00, 0xff, 0xff };
+    const Color Color::CornflowerBlue   { 0x64, 0x95, 0xED };
+    const Color Color::Transparent      { 0x00, 0x00, 0x00, 0x00 };
+
+    const Color Color::Miku             { 0x39, 0xC5, 0xBB };
+    const Color Color::Teto             { 0xE3, 0x42, 0x34 };
+    const Color Color::Rin              { 0xFF, 0xD7, 0x00 };
+}
+
+namespace ikk
+{
+    constexpr Color::Channel::Channel(std::uint8_t value) noexcept
+        : value(value)
+    {};
+
+    // constexpr Color::Channel::Channel(Clamped<float, 0.f, 1.f> value) noexcept
+    //     : value(value.value() * std::numeric_limits<std::uint8_t>::max())
+    // {};
+
+    constexpr Color::Channel::operator float() const noexcept
+    {
+        return this->toFloat();
+    }
+
+    constexpr Color::Channel::operator std::uint8_t() const noexcept
+    {
+        return this->toUInt8();
+    }
+
+    constexpr float Color::Channel::toFloat() const noexcept
+    {
+        return F32(this->value) / F32(std::numeric_limits<std::uint8_t>::max());
+    }
+
+    constexpr std::uint8_t Color::Channel::toUInt8() const noexcept
+    {
+        return this->value;
+    }
+
+    constexpr Color::Color(Channel r, Channel g, Channel b, Channel a) noexcept
+        : r(r), g(g), b(b), a(a)
+    {};
+
+    constexpr Color::Color(std::uint32_t rgba) noexcept
+        : r(U8((rgba >> 24) & 0xFF)), g(U8((rgba >> 16) & 0xFF)), b(U8((rgba >> 8) & 0xFF)), a(U8(rgba & 0xFF))
+    {};
+
+    constexpr std::uint32_t Color::toUInt32() const noexcept
+    {
+        return (U32(r.toUInt8()) << 24) | (U32(g.toUInt8()) << 16) | (U32(b.toUInt8()) << 8)  | (U32(a.toUInt8()));
+    }
+}

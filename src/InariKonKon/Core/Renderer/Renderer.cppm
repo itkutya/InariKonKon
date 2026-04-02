@@ -4,6 +4,8 @@ module;
 
 export module Core:Renderer;
 
+import Color;
+
 export namespace ikk
 {
     class [[nodiscard]] Renderer final
@@ -15,6 +17,9 @@ export namespace ikk
             virtual ~Type() noexcept = default;
 
             [[nodiscard]] virtual bool isValid() const noexcept = 0;
+
+            virtual void beginRender(const Color& clearColor) noexcept = 0;
+            virtual void endRender() noexcept = 0;
         protected:
             Type() noexcept = default;
 
@@ -40,6 +45,9 @@ export namespace ikk
         void create(Args&&... args) noexcept;
 
         [[nodiscard]] bool isValid() const noexcept;
+
+        void beginRender(const Color& clearColor) const noexcept;
+        void endRender() const noexcept;
     private:
         std::shared_ptr<Type> m_renerer = nullptr;
     };
@@ -53,5 +61,15 @@ export namespace ikk
     bool Renderer::isValid() const noexcept
     {
         return this->m_renerer->isValid();
+    }
+
+    void Renderer::beginRender(const Color& clearColor) const noexcept
+    {
+        this->m_renerer->beginRender(clearColor);
+    }
+
+    void Renderer::endRender() const noexcept
+    {
+        this->m_renerer->endRender();
     }
 }
