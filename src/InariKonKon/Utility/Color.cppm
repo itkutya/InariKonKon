@@ -69,22 +69,6 @@ export namespace ikk
         static const Color Teto;
         static const Color Rin;
     };
-
-    //TODO: constexpr somehow...
-    const Color Color::White            { 0xff, 0xff, 0xff };
-    const Color Color::Black            { 0x00, 0x00, 0x00 };
-    const Color Color::Red              { 0xff, 0x00, 0x00 };
-    const Color Color::Green            { 0x00, 0xff, 0x00 };
-    const Color Color::Blue             { 0x00, 0x00, 0xff };
-    const Color Color::Yellow           { 0xff, 0xff, 0x00 };
-    const Color Color::Magenta          { 0xff, 0x00, 0xff };
-    const Color Color::Cyan             { 0x00, 0xff, 0xff };
-    const Color Color::CornflowerBlue   { 0x64, 0x95, 0xED };
-    const Color Color::Transparent      { 0x00, 0x00, 0x00, 0x00 };
-
-    const Color Color::Miku             { 0x39, 0xC5, 0xBB };
-    const Color Color::Teto             { 0xE3, 0x42, 0x34 };
-    const Color Color::Rin              { 0xFF, 0xD7, 0x00 };
 }
 
 namespace ikk
@@ -129,4 +113,19 @@ namespace ikk
     {
         return (U32(r.toUInt8()) << 24) | (U32(g.toUInt8()) << 16) | (U32(b.toUInt8()) << 8)  | (U32(a.toUInt8()));
     }
+
+    inline constexpr Color Color::White             { 0xff, 0xff, 0xff };
+    inline constexpr Color Color::Black             { 0x00, 0x00, 0x00 };
+    inline constexpr Color Color::Red               { 0xff, 0x00, 0x00 };
+    inline constexpr Color Color::Green             { 0x00, 0xff, 0x00 };
+    inline constexpr Color Color::Blue              { 0x00, 0x00, 0xff };
+    inline constexpr Color Color::Yellow            { 0xff, 0xff, 0x00 };
+    inline constexpr Color Color::Magenta           { 0xff, 0x00, 0xff };
+    inline constexpr Color Color::Cyan              { 0x00, 0xff, 0xff };
+    inline constexpr Color Color::CornflowerBlue    { 0x64, 0x95, 0xED };
+    inline constexpr Color Color::Transparent       { 0x00, 0x00, 0x00, 0x00 };
+
+    inline constexpr Color Color::Miku              { 0x39, 0xC5, 0xBB };
+    inline constexpr Color Color::Teto              { 0xE3, 0x42, 0x34 };
+    inline constexpr Color Color::Rin               { 0xFF, 0xD7, 0x00 };
 }
