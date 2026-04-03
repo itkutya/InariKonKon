@@ -7,3 +7,5 @@ export import Input;
 export import Time;
 export import Clock;
 export import Log;
+export import Color;
+export import Clamped;

@@ -2,6 +2,7 @@ module;
 
 #include <string_view>
 #include <filesystem>
+#include <fstream>
 #include <cstdint>
 #include <vector>
 #include <string>
@@ -47,6 +48,9 @@ export namespace ikk
         ~BasicShader() noexcept = default;
 
         [[nodiscard]] std::vector<std::uint32_t> convertToSPIRV() const noexcept;
+
+        void saveToFile(const std::filesystem::path& path) const noexcept;
+        void saveToFile() const noexcept;
     private:
         Shader::Type m_type = type;
         std::filesystem::path m_path = "";
@@ -59,11 +63,14 @@ export namespace ikk
 
 namespace ikk
 {
-    //TODO:
     template <Shader::Type type>
     BasicShader<type>::BasicShader(std::filesystem::path path) noexcept
         : m_path(std::move(path))
     {
+        std::ifstream file{ this->m_path, std::ios::binary | std::ios::ate };
+        this->m_source.resize(file.tellg());
+        file.seekg(0);
+        file.read(this->m_source.data(), this->m_source.size());
     }
 
     template <Shader::Type type>
@@ -77,21 +84,39 @@ namespace ikk
     {
         const shaderc::Compiler compiler;
         shaderc::CompileOptions options;
-        options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
+        options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_4);
         options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-        shaderc_shader_kind kind = shaderc_glsl_vertex_shader;
+        shaderc_shader_kind kind = {};
         switch (type)
         {
-        case Shader::Type::Vertex: kind = shaderc_glsl_vertex_shader; break;
-        case Shader::Type::Fragment: kind = shaderc_glsl_fragment_shader; break;
-        default: return {};
+            case Shader::Type::Vertex: kind = shaderc_glsl_vertex_shader;       break;
+            case Shader::Type::Fragment: kind = shaderc_glsl_fragment_shader;   break;
+            default: return {};
         }
 
         const shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(this->m_source, kind, this->m_path.string().c_str(), options);
         if (module.GetCompilationStatus() != shaderc_compilation_status_success)
+        {
             Print<Log::Level::Error>("{}", module.GetErrorMessage());
+            return {};
+        }
 
         return std::vector<std::uint32_t>{ module.cbegin(), module.cend() };
+    }
+
+    template <Shader::Type type>
+    void BasicShader<type>::saveToFile(const std::filesystem::path& path) const noexcept
+    {
+        if (this->m_source.empty() == true) return;
+
+        std::ofstream file{ path, std::ios::binary | std::ios::trunc };
+        file.write(this->m_source.data(), this->m_source.size());
+    }
+
+    template <Shader::Type type>
+    void BasicShader<type>::saveToFile() const noexcept
+    {
+        this->saveToFile(this->m_path);
     }
 }

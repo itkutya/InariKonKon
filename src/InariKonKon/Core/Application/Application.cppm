@@ -17,6 +17,7 @@ import :Layer;
 
 import Time;
 import Clock;
+import Color;
 
 export namespace ikk
 {

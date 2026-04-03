@@ -19,7 +19,7 @@ include(FetchContent)
 FetchContent_Declare(glfw GIT_REPOSITORY https://github.com/glfw/glfw.git GIT_TAG master)
 FetchContent_MakeAvailable(glfw)
 
-FetchContent_Declare(fmt GIT_REPOSITORY https://github.com/fmtlib/fmt.git GIT_TAG master)
+FetchContent_Declare(fmt GIT_REPOSITORY https://github.com/fmtlib/fmt.git GIT_TAG main)
 FetchContent_MakeAvailable(fmt)
 
 find_package(Vulkan REQUIRED shaderc_combined)

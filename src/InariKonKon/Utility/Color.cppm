@@ -1,22 +1,26 @@
 module;
 
+#include <type_traits>
 #include <cstdint>
 #include <limits>
 
 export module Color;
 
 import Utility;
+import Clamped;
+import Math;
 
 export namespace ikk
 {
-    //TODO:
-    struct [[nodiscard]] Color final
+    template<Number T>
+    struct [[nodiscard]] BasicColor final
     {
         struct [[nodiscard]] Channel final
         {
+            using Type = T;
+
             [[nodiscard]] constexpr Channel() noexcept = default;
-            [[nodiscard]] constexpr Channel(std::uint8_t value) noexcept;
-            //[[nodiscard]] constexpr Channel(Clamped<float, 0.f, 1.f> value) noexcept;
+            [[nodiscard]] constexpr Channel(T value) noexcept;
 
             constexpr Channel(const Channel&) noexcept = default;
             constexpr Channel(Channel&&) noexcept = default;
@@ -26,106 +30,108 @@ export namespace ikk
 
             constexpr ~Channel() noexcept = default;
 
-            [[nodiscard]] constexpr operator float() const noexcept;
-            [[nodiscard]] constexpr operator std::uint8_t() const noexcept;
+            [[nodiscard]] constexpr operator T() const noexcept;
 
-            [[nodiscard]] constexpr float toFloat() const noexcept;
-            [[nodiscard]] constexpr std::uint8_t toUInt8() const noexcept;
-
-            std::uint8_t value = 0;
+            T value = 0;
         };
 
-        [[nodiscard]] constexpr Color() noexcept = default;
-        [[nodiscard]] constexpr Color(Channel r, Channel g, Channel b, Channel a = { 0xff }) noexcept;
-        [[nodiscard]] constexpr Color(std::uint32_t rgba) noexcept;
+        [[nodiscard]] constexpr BasicColor() noexcept = default;
+        [[nodiscard]] constexpr BasicColor(T r, T g, T b, T a = std::numeric_limits<T>::max()) noexcept;
 
-        constexpr Color(const Color&) noexcept = default;
-        constexpr Color(Color&&) noexcept = default;
+        constexpr BasicColor(const BasicColor&) noexcept = default;
+        constexpr BasicColor(BasicColor&&) noexcept = default;
 
-        constexpr Color& operator=(const Color&) noexcept = default;
-        constexpr Color& operator=(Color&&) noexcept = default;
+        constexpr BasicColor& operator=(const BasicColor&) noexcept = default;
+        constexpr BasicColor& operator=(BasicColor&&) noexcept = default;
 
-        constexpr ~Color() noexcept = default;
-
-        [[nodiscard]] constexpr std::uint32_t toUInt32() const noexcept;
+        constexpr ~BasicColor() noexcept = default;
 
         Channel r = {};
         Channel g = {};
         Channel b = {};
-        Channel a = { 0xff };
+        Channel a = { std::numeric_limits<T>::max() };
 
-        static const Color White;
-        static const Color Black;
-        static const Color Red;
-        static const Color Green;
-        static const Color Blue;
-        static const Color Yellow;
-        static const Color Magenta;
-        static const Color Cyan;
-        static const Color CornflowerBlue;
-        static const Color Transparent;
+        static const BasicColor White;
+        static const BasicColor Black;
+        static const BasicColor Red;
+        static const BasicColor Green;
+        static const BasicColor Blue;
+        static const BasicColor Yellow;
+        static const BasicColor Magenta;
+        static const BasicColor Cyan;
+        static const BasicColor CornflowerBlue;
+        static const BasicColor Transparent;
 
-        static const Color Miku;
-        static const Color Teto;
-        static const Color Rin;
+        static const BasicColor Miku;
+        static const BasicColor Teto;
+        static const BasicColor Rin;
     };
+
+    using Colorf = BasicColor<Clamped<float, 0.f, 1.f>>;
+    using Coloru8 = BasicColor<std::uint8_t>;
+
+    using Color = Coloru8;
 }
 
 namespace ikk
 {
-    constexpr Color::Channel::Channel(std::uint8_t value) noexcept
+    template <Number T>
+    constexpr BasicColor<T>::Channel::Channel(T value) noexcept
         : value(value)
-    {};
-
-    // constexpr Color::Channel::Channel(Clamped<float, 0.f, 1.f> value) noexcept
-    //     : value(value.value() * std::numeric_limits<std::uint8_t>::max())
-    // {};
-
-    constexpr Color::Channel::operator float() const noexcept
     {
-        return this->toFloat();
     }
 
-    constexpr Color::Channel::operator std::uint8_t() const noexcept
+    template <Number T>
+    constexpr BasicColor<T>::Channel::operator T() const noexcept
     {
-        return this->toUInt8();
+        return value;
     }
 
-    constexpr float Color::Channel::toFloat() const noexcept
-    {
-        return F32(this->value) / F32(std::numeric_limits<std::uint8_t>::max());
-    }
-
-    constexpr std::uint8_t Color::Channel::toUInt8() const noexcept
-    {
-        return this->value;
-    }
-
-    constexpr Color::Color(Channel r, Channel g, Channel b, Channel a) noexcept
+    template <Number T>
+    constexpr BasicColor<T>::BasicColor(T r, T g, T b, T a) noexcept
         : r(r), g(g), b(b), a(a)
-    {};
-
-    constexpr Color::Color(std::uint32_t rgba) noexcept
-        : r(U8((rgba >> 24) & 0xFF)), g(U8((rgba >> 16) & 0xFF)), b(U8((rgba >> 8) & 0xFF)), a(U8(rgba & 0xFF))
-    {};
-
-    constexpr std::uint32_t Color::toUInt32() const noexcept
     {
-        return (U32(r.toUInt8()) << 24) | (U32(g.toUInt8()) << 16) | (U32(b.toUInt8()) << 8)  | (U32(a.toUInt8()));
     }
 
-    inline constexpr Color Color::White             { 0xff, 0xff, 0xff };
-    inline constexpr Color Color::Black             { 0x00, 0x00, 0x00 };
-    inline constexpr Color Color::Red               { 0xff, 0x00, 0x00 };
-    inline constexpr Color Color::Green             { 0x00, 0xff, 0x00 };
-    inline constexpr Color Color::Blue              { 0x00, 0x00, 0xff };
-    inline constexpr Color Color::Yellow            { 0xff, 0xff, 0x00 };
-    inline constexpr Color Color::Magenta           { 0xff, 0x00, 0xff };
-    inline constexpr Color Color::Cyan              { 0x00, 0xff, 0xff };
-    inline constexpr Color Color::CornflowerBlue    { 0x64, 0x95, 0xED };
-    inline constexpr Color Color::Transparent       { 0x00, 0x00, 0x00, 0x00 };
+    //TODO: Work on this for a bit more, it works for now...
+    template<Number T>
+    inline constexpr T convert(std::uint8_t value) noexcept
+    {
+        Clamped<std::uint8_t> temp{value};
+        if constexpr (std::is_class<T>::value == true)
+            return T{temp};
+        else
+        {
+            Clamped<T> clamped{temp};
+            return T{clamped.value()};
+        }
+    }
 
-    inline constexpr Color Color::Miku              { 0x39, 0xC5, 0xBB };
-    inline constexpr Color Color::Teto              { 0xE3, 0x42, 0x34 };
-    inline constexpr Color Color::Rin               { 0xFF, 0xD7, 0x00 };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::White             { convert<T>(0xFF), convert<T>(0xFF), convert<T>(0xFF) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Black             { convert<T>(0x00), convert<T>(0x00), convert<T>(0x00) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Red               { convert<T>(0xFF), convert<T>(0x00), convert<T>(0x00) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Green             { convert<T>(0x00), convert<T>(0xFF), convert<T>(0x00) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Blue              { convert<T>(0x00), convert<T>(0x00), convert<T>(0xFF) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Yellow            { convert<T>(0xFF), convert<T>(0xFF), convert<T>(0x00) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Magenta           { convert<T>(0xFF), convert<T>(0x00), convert<T>(0xFF) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Cyan              { convert<T>(0x00), convert<T>(0xFF), convert<T>(0xFF) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Transparent       { convert<T>(0x00), convert<T>(0x00), convert<T>(0x00), convert<T>(0x00) };
+
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::CornflowerBlue    { convert<T>(0x64), convert<T>(0x95), convert<T>(0xED) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Miku              { convert<T>(0x39), convert<T>(0xC5), convert<T>(0xBB) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Teto              { convert<T>(0xE3), convert<T>(0x42), convert<T>(0x34) };
+    template<Number T>
+    inline constexpr BasicColor<T> BasicColor<T>::Rin               { convert<T>(0xFF), convert<T>(0xD7), convert<T>(0x00) };
 }

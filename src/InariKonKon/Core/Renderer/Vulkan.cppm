@@ -178,11 +178,16 @@ namespace ikk
         vk::CommandBufferBeginInfo beginInfo{};
         this->m_commandBuffers[this->m_imageIndex].begin(beginInfo);
 
-        const vk::ClearValue color{std::array<float,4>{
-            clearColor.r.toFloat(),
-            clearColor.g.toFloat(),
-            clearColor.b.toFloat(),
-            clearColor.a.toFloat() }};
+        const vk::ClearValue color{std::array<float, 4>{
+            F32(clearColor.r.value) / F32(std::numeric_limits<std::uint8_t>::max()),
+            F32(clearColor.g.value) / F32(std::numeric_limits<std::uint8_t>::max()),
+            F32(clearColor.b.value) / F32(std::numeric_limits<std::uint8_t>::max()),
+            F32(clearColor.a.value) / F32(std::numeric_limits<std::uint8_t>::max()) }};
+        // const vk::ClearValue color{std::array<float, 4>{
+        //     F32(clearColor.r.value.value()),
+        //     F32(clearColor.g.value.value()),
+        //     F32(clearColor.b.value.value()),
+        //     F32(clearColor.a.value.value()) }};
 
         vk::RenderPassBeginInfo renderPassInfo{};
         renderPassInfo.renderPass = this->m_renderPass;
