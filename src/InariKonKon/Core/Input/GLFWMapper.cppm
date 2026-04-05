@@ -5,7 +5,7 @@ module;
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
-export module Core:Conversion;
+export module Core:GLFWMapper;
 
 import :Keyboard;
 import :Mouse;
@@ -16,9 +16,8 @@ import NumericCasts;
 export namespace ikk
 {
     //TODO: Rename to something else...
-    class Conversion final : public NonConstructible
+    class GLFWMapper final : public NonConstructible
     {
-    public:
         [[nodiscard]] static constexpr Input::Action fromGLFWAction(std::int32_t action) noexcept;
         [[nodiscard]] static constexpr std::int32_t toGLFWAction(Input::Action type) noexcept;
 
@@ -27,12 +26,14 @@ export namespace ikk
 
         [[nodiscard]] static constexpr std::int32_t toGLFWButton(Mouse::Button button) noexcept;
         [[nodiscard]] static constexpr Mouse::Button fromGLFWButton(std::int32_t button) noexcept;
+
+        friend class EventCallbackFuncs;
     };
 }
 
 namespace ikk
 {
-    constexpr Input::Action Conversion::fromGLFWAction(std::int32_t action) noexcept
+    constexpr Input::Action GLFWMapper::fromGLFWAction(std::int32_t action) noexcept
     {
         switch (action)
         {
@@ -43,7 +44,7 @@ namespace ikk
         }
     }
 
-    constexpr std::int32_t Conversion::toGLFWAction(Input::Action type) noexcept
+    constexpr std::int32_t GLFWMapper::toGLFWAction(Input::Action type) noexcept
     {
         switch (type)
         {
@@ -55,7 +56,7 @@ namespace ikk
         return GLFW_KEY_UNKNOWN;
     }
 
-    constexpr std::int32_t Conversion::toGLFWKeyCode(Keyboard::KeyCode keycode) noexcept
+    constexpr std::int32_t GLFWMapper::toGLFWKeyCode(Keyboard::KeyCode keycode) noexcept
     {
         switch (keycode)
         {
@@ -183,7 +184,7 @@ namespace ikk
         return GLFW_KEY_UNKNOWN;
     }
 
-    constexpr Keyboard::KeyCode Conversion::fromGLFWKeyCode(std::int32_t keycode) noexcept
+    constexpr Keyboard::KeyCode GLFWMapper::fromGLFWKeyCode(std::int32_t keycode) noexcept
     {
         switch (keycode)
         {
@@ -311,7 +312,7 @@ namespace ikk
         }
     }
 
-    constexpr std::int32_t Conversion::toGLFWButton(Mouse::Button button) noexcept
+    constexpr std::int32_t GLFWMapper::toGLFWButton(Mouse::Button button) noexcept
     {
         switch (button)
         {
@@ -328,7 +329,7 @@ namespace ikk
         return GLFW_KEY_UNKNOWN;
     }
 
-    constexpr Mouse::Button Conversion::fromGLFWButton(std::int32_t button) noexcept
+    constexpr Mouse::Button GLFWMapper::fromGLFWButton(std::int32_t button) noexcept
     {
         switch (button)
         {

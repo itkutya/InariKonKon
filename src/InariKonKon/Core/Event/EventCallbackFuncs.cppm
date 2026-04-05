@@ -10,7 +10,7 @@ export module Core:EventCallbackFuncs;
 
 import :InputManager;
 import :EventManager;
-import :Conversion;
+import :GLFWMapper;
 import :Event;
 import :Input;
 
@@ -160,18 +160,18 @@ namespace ikk
     {
         //TODO: Fix later...
         if (auto& mapping = Keyboard::getScanCodeMapping(); mapping.contains(scancode) == false)
-            mapping.emplace(scancode, Conversion::fromGLFWKeyCode(key));
+            mapping.emplace(scancode, GLFWMapper::fromGLFWKeyCode(key));
 
-        const Keyboard::KeyCode keycode = Conversion::fromGLFWKeyCode(key);
-        const Input::Action state = Conversion::fromGLFWAction(action);
+        const Keyboard::KeyCode keycode = GLFWMapper::fromGLFWKeyCode(key);
+        const Input::Action state = GLFWMapper::fromGLFWAction(action);
         eventManager.emplace(InputEvent::Keyboard{ .keycode = keycode, .scancode = scancode, .state = state });
         Input.handleEvent(keycode, state);
     }
 
     void EventCallbackFuncs::mouseButtonCallback([[maybe_unused]] GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) noexcept
     {
-        const Mouse::Button mButton = Conversion::fromGLFWButton(button);
-        const Input::Action state = Conversion::fromGLFWAction(action);
+        const Mouse::Button mButton = GLFWMapper::fromGLFWButton(button);
+        const Input::Action state = GLFWMapper::fromGLFWAction(action);
         eventManager.emplace(InputEvent::Mouse::Button{ .button = mButton, .state = state });
         Input.handleEvent(mButton, state);
     }

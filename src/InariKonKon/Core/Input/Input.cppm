@@ -72,12 +72,13 @@ namespace ikk
         this->m_actions.emplace_back(std::move(name));
     }
 
-    template <class T>
-    void Input::handleEvent(T input, Action action) noexcept
+    void Input::onAction(const std::string& name, Callback&& func) noexcept
     {
+        this->m_callbacks.emplace_back(std::move(func));
     }
 
-    void Input::onAction(const std::string& name, Callback&& func) noexcept
+    template <class T>
+    void Input::handleEvent(T input, Action action) noexcept
     {
     }
 }
