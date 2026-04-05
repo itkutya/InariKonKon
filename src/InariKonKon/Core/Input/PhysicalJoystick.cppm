@@ -6,12 +6,12 @@ module;
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
-export module Input:PhysicalJoystick;
+export module Core:PhysicalJoystick;
 
-import :InputState;
 import :Joystick;
+import :Input;
 
-import Utility;
+import NumericCasts;
 
 export namespace ikk
 {
@@ -35,7 +35,7 @@ export namespace ikk
 
         [[nodiscard]] static bool isConnected(Joystick::ID id) noexcept;
 
-        [[nodiscard]] Input::State getJoystickButtonState(Joystick::Button button) const noexcept;
+        [[nodiscard]] Input::Action getJoystickButtonState(Joystick::Button button) const noexcept;
         [[nodiscard]] float getJoystickAxisValue(Joystick::Axis axis) const noexcept;
         [[nodiscard]] bool getJoystickHatState(std::uint32_t id, Joystick::Hat hat) const noexcept;
     private:
@@ -93,18 +93,18 @@ namespace ikk
         return glfwJoystickPresent(I32(id)) == GLFW_TRUE;
     }
 
-    Input::State PhysicalJoystick::getJoystickButtonState(Joystick::Button button) const noexcept
+    Input::Action PhysicalJoystick::getJoystickButtonState(Joystick::Button button) const noexcept
     {
         const std::int32_t index = Joystick::toGLFWButton(button);
 
         if (this->m_isGamepadInputAvailable)
             if (GLFWgamepadstate state{}; glfwGetGamepadState(I32(this->m_id), &state) != GLFW_FALSE)
-                return state.buttons[index] == GLFW_PRESS ? Input::State::Press : Input::State::Release;
+                return state.buttons[index] == GLFW_PRESS ? Input::Action::Press : Input::Action::Release;
 
         if (this->m_joystickButtonCount < index)
-            return Input::State::Unknown;
+            return Input::Action::Unknown;
 
-        return this->m_buttons[index] == GLFW_PRESS ? Input::State::Press : Input::State::Release;
+        return this->m_buttons[index] == GLFW_PRESS ? Input::Action::Press : Input::Action::Release;
     }
 
     float PhysicalJoystick::getJoystickAxisValue(Joystick::Axis axis) const noexcept

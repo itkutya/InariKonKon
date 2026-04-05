@@ -3,6 +3,7 @@ module;
 #include <string_view>
 #include <utility>
 #include <cstdint>
+#include <memory>
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
@@ -13,7 +14,7 @@ import :EventCallbackFuncs;
 import :Renderer;
 import :Vulkan;
 
-import Utility;
+import Color;
 
 export namespace ikk
 {
@@ -33,12 +34,16 @@ export namespace ikk
         [[nodiscard]] bool shouldClose() const noexcept;
 
         void pollEvents() const noexcept;
-        void render(const Color& clearColor) const noexcept;
+        void render() const noexcept;
 
-        [[nodiscard]] const Renderer& getRenderer() const noexcept;
+        [[nodiscard]] const std::shared_ptr<Renderer::Type>& getRenderer() const noexcept;
+        [[nodiscard]] std::shared_ptr<Renderer::Type>& getRenderer() noexcept;
     private:
         GLFWwindow* m_window = nullptr;
         Renderer m_renderer{};
+
+        //TODO: Window settings...
+        Color m_clearColor = Color::Miku;
 
         void setupWindow() noexcept;
     };
@@ -125,16 +130,21 @@ namespace ikk
         if (this->m_window != nullptr) glfwPollEvents();
     }
 
-    void Window::render(const Color& clearColor) const noexcept
+    void Window::render() const noexcept
     {
-        this->m_renderer.beginRender(clearColor);
+        this->getRenderer()->beginRender(this->m_clearColor);
         //TODO: Draw stuff here...
-        this->m_renderer.endRender();
+        this->getRenderer()->endRender();
     }
 
-    const Renderer& Window::getRenderer() const noexcept
+    const std::shared_ptr<Renderer::Type>& Window::getRenderer() const noexcept
     {
-        return this->m_renderer;
+        return this->m_renderer.get();
+    }
+
+    std::shared_ptr<Renderer::Type>& Window::getRenderer() noexcept
+    {
+        return this->m_renderer.get();
     }
 
     void Window::setupWindow() noexcept
@@ -146,7 +156,7 @@ namespace ikk
 
         glfwSetWindowUserPointer(this->m_window, this);
 
-        if constexpr (isDebug()) glfwSetErrorCallback(EventCallbackFuncs::errorCallback);
+        if constexpr (isDebug() == true) glfwSetErrorCallback(EventCallbackFuncs::errorCallback);
         glfwSetWindowCloseCallback(this->m_window, EventCallbackFuncs::windowClosedCallback);
         glfwSetWindowSizeCallback(this->m_window, EventCallbackFuncs::windowResizeCallback);
         glfwSetFramebufferSizeCallback(this->m_window, EventCallbackFuncs::framebufferResizeCallback);

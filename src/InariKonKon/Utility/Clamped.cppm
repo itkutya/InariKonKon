@@ -6,9 +6,9 @@ module;
 
 export module Clamped;
 
-import Math;
+import Number;
 
-export namespace ikk
+namespace ikk
 {
     template<Number T>
     struct DefaultClampedRange
@@ -37,7 +37,10 @@ export namespace ikk
         inline static constexpr long double min = 0.0L;
         inline static constexpr long double max = 1.0L;
     };
+}
 
+export namespace ikk
+{
     template<Number T, T Min = DefaultClampedRange<T>::min, T Max = DefaultClampedRange<T>::max>
     class [[nodiscard]] Clamped final
     {
@@ -386,55 +389,16 @@ namespace ikk
     template<Number U, U OtherMin, U OtherMax> requires (std::is_convertible<U, T>::value)
     constexpr T Clamped<T, Min, Max>::convertValueFromOtherRange(U other) const noexcept
     {
-        using Common = std::common_type_t<T, U, std::int64_t>;
+        using CommonType = std::common_type_t<T, U>;
 
-        const Common otherRange = static_cast<Common>(OtherMax) - static_cast<Common>(OtherMin);
-        const Common range      = static_cast<Common>(Max) - static_cast<Common>(Min);
+        constexpr CommonType otherRange = static_cast<CommonType>(OtherMax) - static_cast<CommonType>(OtherMin);
+        constexpr CommonType range      = static_cast<CommonType>(Max) - static_cast<CommonType>(Min);
 
-        if (otherRange == 0) return Min;
+        if constexpr (otherRange == 0) return Min;
 
-        Common value = ((static_cast<Common>(other) - static_cast<Common>(OtherMin)) * range) / otherRange + static_cast<Common>(Min);
-        value = std::clamp(value, static_cast<Common>(Min), static_cast<Common>(Max));
+        CommonType value = ((static_cast<CommonType>(other) - static_cast<CommonType>(OtherMin)) * range) / otherRange + static_cast<CommonType>(Min);
+        value = std::clamp(value, static_cast<CommonType>(Min), static_cast<CommonType>(Max));
 
         return static_cast<T>(value);
     }
-}
-
-export namespace std
-{
-    template<ikk::Number T, T Min, T Max>
-    struct numeric_limits<ikk::Clamped<T, Min, Max>>
-    {
-    public:
-        static constexpr bool is_specialized = true;
-
-        static constexpr T min() noexcept
-        {
-            return Min;
-        }
-
-        static constexpr T max() noexcept
-        {
-            return Max;
-        }
-
-        static constexpr T lowest() noexcept
-        {
-            return std::numeric_limits<T>::lowest();
-        }
-
-        static constexpr int digits = std::numeric_limits<T>::digits;
-        static constexpr int digits10 = std::numeric_limits<T>::digits10;
-
-        static constexpr bool is_signed = std::is_signed<T>::value;
-        static constexpr bool is_integer = std::is_integral<T>::value;
-        static constexpr bool is_exact = std::is_integral<T>::value;
-        static constexpr bool is_bounded = true;
-
-        static constexpr bool has_infinity = true;
-        static constexpr T infinity() noexcept
-        {
-            return std::numeric_limits<T>::infinity();
-        }
-    };
 }

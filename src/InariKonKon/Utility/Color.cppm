@@ -6,11 +6,12 @@ module;
 
 export module Color;
 
-import Utility;
+import NumericCasts;
 import Clamped;
-import Math;
 
-export namespace ikk
+import Number;
+
+namespace ikk
 {
     template<Number T>
     struct [[nodiscard]] BasicColor final
@@ -66,7 +67,10 @@ export namespace ikk
         static const BasicColor Teto;
         static const BasicColor Rin;
     };
+}
 
+export namespace ikk
+{
     using Colorf = BasicColor<Clamped<float, 0.f, 1.f>>;
     using Coloru8 = BasicColor<std::uint8_t>;
 

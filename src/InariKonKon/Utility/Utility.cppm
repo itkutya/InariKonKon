@@ -1,45 +1,19 @@
-module;
-
-#include <type_traits>
-#include <cstdint>
-
 export module Utility;
 
-namespace ikk
-{
-    #define DEFINE_CAST_FUNC(NAME, TYPE)                                                            \
-    template<class T> requires (std::is_convertible<T, TYPE>::value == true)                        \
-    [[nodiscard]] inline constexpr TYPE NAME(T value) noexcept { return static_cast<TYPE>(value); }
-}
+export import NumericCasts;
+export import DebugFeatures;
 
-export namespace ikk
-{
-    inline constexpr bool isDebug() noexcept
-    {
-    #ifndef NDEBUG
-        return true;
-    #else
-        return false;
-    #endif
-    }
+export import NonConstructible;
+export import NonCopyable;
+export import NonMovable;
+export import Singleton;
 
-    inline constexpr bool isRelease() noexcept
-    {
-        return !isDebug();
-    }
+export import Time;
+export import Clock;
 
-    DEFINE_CAST_FUNC(U64, std::uint64_t)
-    DEFINE_CAST_FUNC(U32, std::uint32_t)
-    DEFINE_CAST_FUNC(U16, std::uint16_t)
-    DEFINE_CAST_FUNC(U8,  std::uint8_t)
+export import Clamped;
+export import Color;
 
-    DEFINE_CAST_FUNC(I64, std::int64_t)
-    DEFINE_CAST_FUNC(I32, std::int32_t)
-    DEFINE_CAST_FUNC(I16, std::int16_t)
-    DEFINE_CAST_FUNC(I8,  std::int8_t)
+export import Flag;
 
-    DEFINE_CAST_FUNC(F32, float)
-    DEFINE_CAST_FUNC(F64, double)
-
-    DEFINE_CAST_FUNC(BOOL, bool)
-}
+export import Log;

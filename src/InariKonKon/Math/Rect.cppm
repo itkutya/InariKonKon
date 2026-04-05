@@ -5,7 +5,7 @@ module;
 export module Rect;
 
 import Quaternion;
-import Math;
+import Number;
 import Vec;
 
 export namespace ikk

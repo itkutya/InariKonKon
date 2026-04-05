@@ -11,15 +11,17 @@ module;
 
 export module Log;
 
+import NonConstructible;
 import NonCopyable;
 import NonMovable;
-import Utility;
+import DebugFeatures;
 import Flag;
 
 export namespace ikk
 {
-    namespace Log
+    class Log final : public NonConstructible
     {
+    public:
         enum struct Level : std::uint8_t
         {
             Info = 0,
@@ -36,8 +38,11 @@ export namespace ikk
             Debug       = 1 << 2,
             All         = None | Date | Severity
         };
-    }
+    };
+}
 
+namespace ikk
+{
     template<Log::Level level = Log::Level::Info, Log::Flags flags = Log::Flags::All>
     class BasicLogger final : public NonCopyable, public NonMovable
     {
@@ -49,7 +54,10 @@ export namespace ikk
     private:
         [[nodiscard]] static constexpr std::string_view convertToString(Log::Level severety) noexcept;
     };
+}
 
+export namespace ikk
+{
     template<Log::Level level = Log::Level::Info, Log::Flags flags = Log::Flags::All>
     using DebugPrint = BasicLogger<level, static_cast<Log::Flags>(std::to_underlying(flags) | std::to_underlying(Log::Flags::Debug))>;
 

@@ -8,22 +8,18 @@ module;
 
 export module Core:EventCallbackFuncs;
 
+import :InputManager;
 import :EventManager;
+import :Conversion;
 import :Event;
+import :Input;
 
 import NonConstructible;
-import InputManager;
-import Conversion;
-import Utility;
-import Input;
 import Log;
 import Vec;
 
 export namespace ikk
 {
-    class Monitor;
-    class Window;
-
     class EventCallbackFuncs final : public NonConstructible
     {
         static void errorCallback(int code, const char* description) noexcept;
@@ -78,86 +74,86 @@ namespace ikk
     void EventCallbackFuncs::windowClosedCallback(GLFWwindow* window) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        EventManager::getInstance().emplace(WindowEvent::Closed{ .window = ptr });
+        eventManager.emplace(WindowEvent::Closed{ .window = ptr });
     }
 
     void EventCallbackFuncs::windowResizeCallback(GLFWwindow* window, int width, int height) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        EventManager::getInstance().emplace(WindowEvent::Resized{ .window = ptr, .width = U32(width), .height = U32(height) });
+        eventManager.emplace(WindowEvent::Resized{ .window = ptr, .width = U32(width), .height = U32(height) });
     }
 
     void EventCallbackFuncs::framebufferResizeCallback(GLFWwindow* window, int width, int height) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        EventManager::getInstance().emplace(WindowEvent::FramebufferResized{ .window = ptr, .width = U32(width), .height = U32(height) });
+        eventManager.emplace(WindowEvent::FramebufferResized{ .window = ptr, .width = U32(width), .height = U32(height) });
     }
 
     void EventCallbackFuncs::windowContentScaleCallback(GLFWwindow* window, float xscale, float yscale) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        EventManager::getInstance().emplace(WindowEvent::ContentScale{ .window = ptr, .scale = Vec2f{ xscale, yscale } });
+        eventManager.emplace(WindowEvent::ContentScale{ .window = ptr, .scale = Vec2f{ xscale, yscale } });
     }
 
     void EventCallbackFuncs::windowPositionCallback(GLFWwindow* window, int xpos, int ypos) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        EventManager::getInstance().emplace(WindowEvent::Position{ .window = ptr, .position = Vec2i{ xpos, ypos } });
+        eventManager.emplace(WindowEvent::Position{ .window = ptr, .position = Vec2i{ xpos, ypos } });
     }
 
     void EventCallbackFuncs::windowIconifyCallback(GLFWwindow* window, int iconified) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
         if (iconified == GLFW_TRUE)
-            EventManager::getInstance().emplace(WindowEvent::Iconified{ .window = ptr });
+            eventManager.emplace(WindowEvent::Iconified{ .window = ptr });
         else if (iconified == GLFW_FALSE)
-            EventManager::getInstance().emplace(WindowEvent::UnIconified{ .window = ptr });
+            eventManager.emplace(WindowEvent::UnIconified{ .window = ptr });
     }
 
     void EventCallbackFuncs::windowMaximizeCallback(GLFWwindow* window, int maximized) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
         if (maximized == GLFW_TRUE)
-            EventManager::getInstance().emplace(WindowEvent::Maximized{ .window = ptr });
+            eventManager.emplace(WindowEvent::Maximized{ .window = ptr });
         else if (maximized == GLFW_FALSE)
-            EventManager::getInstance().emplace(WindowEvent::Minimized{ .window = ptr });
+            eventManager.emplace(WindowEvent::Minimized{ .window = ptr });
     }
 
     void EventCallbackFuncs::windowFocusCallback(GLFWwindow* window, int focused) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
         if (focused == GLFW_TRUE)
-            EventManager::getInstance().emplace(WindowEvent::FocusGained{ .window = ptr });
+            eventManager.emplace(WindowEvent::FocusGained{ .window = ptr });
         else if (focused == GLFW_FALSE)
-            EventManager::getInstance().emplace(WindowEvent::FocusLost{ .window = ptr });
+            eventManager.emplace(WindowEvent::FocusLost{ .window = ptr });
     }
 
     void EventCallbackFuncs::windowRefreshCallback(GLFWwindow* window) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        EventManager::getInstance().emplace(WindowEvent::Refreshed{ .window = ptr });
+        eventManager.emplace(WindowEvent::Refreshed{ .window = ptr });
     }
 
     void EventCallbackFuncs::monitorCallback(GLFWmonitor* monitor, int event) noexcept
     {
         if (event == GLFW_CONNECTED)
-            EventManager::getInstance().emplace(Event::Monitor::Connected{ .monitor = reinterpret_cast<Monitor*>(monitor) });
+            eventManager.emplace(Event::Monitor::Connected{ .monitor = reinterpret_cast<Monitor*>(monitor) });
         else if (event == GLFW_DISCONNECTED)
-            EventManager::getInstance().emplace(Event::Monitor::Disconnected{ .monitor = reinterpret_cast<Monitor*>(monitor) });
+            eventManager.emplace(Event::Monitor::Disconnected{ .monitor = reinterpret_cast<Monitor*>(monitor) });
     }
 
     void EventCallbackFuncs::cursorEnterCallback(GLFWwindow* window, int entered) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
         if (entered == GLFW_TRUE)
-            EventManager::getInstance().emplace(WindowEvent::CursorEntered{ .window = ptr });
+            eventManager.emplace(WindowEvent::CursorEntered{ .window = ptr });
         else if (entered == GLFW_FALSE)
-            EventManager::getInstance().emplace(WindowEvent::CursorLeft{ .window = ptr });
+            eventManager.emplace(WindowEvent::CursorLeft{ .window = ptr });
     }
 
     void EventCallbackFuncs::characterCallback([[maybe_unused]] GLFWwindow* window, unsigned int codepoint) noexcept
     {
-        EventManager::getInstance().emplace(InputEvent::Text{ .unicode = static_cast<char32_t>(codepoint) });
+        eventManager.emplace(InputEvent::Text{ .unicode = static_cast<char32_t>(codepoint) });
     }
 
     void EventCallbackFuncs::keyInputCallback([[maybe_unused]] GLFWwindow* window, int key, int scancode, int action, [[maybe_unused]] int mods) noexcept
@@ -167,42 +163,47 @@ namespace ikk
             mapping.emplace(scancode, Conversion::fromGLFWKeyCode(key));
 
         const Keyboard::KeyCode keycode = Conversion::fromGLFWKeyCode(key);
-        const Input::State state = Conversion::fromGLFWAction(action);
-        EventManager::getInstance().emplace(InputEvent::Keyboard{ .keycode = keycode, .scancode = scancode, .state = state });
+        const Input::Action state = Conversion::fromGLFWAction(action);
+        eventManager.emplace(InputEvent::Keyboard{ .keycode = keycode, .scancode = scancode, .state = state });
+        Input.handleEvent(keycode, state);
     }
 
     void EventCallbackFuncs::mouseButtonCallback([[maybe_unused]] GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) noexcept
     {
         const Mouse::Button mButton = Conversion::fromGLFWButton(button);
-        const Input::State state = Conversion::fromGLFWAction(action);
-        EventManager::getInstance().emplace(InputEvent::Mouse::Button{ .button = mButton, .state = state });
+        const Input::Action state = Conversion::fromGLFWAction(action);
+        eventManager.emplace(InputEvent::Mouse::Button{ .button = mButton, .state = state });
+        Input.handleEvent(mButton, state);
     }
 
     void EventCallbackFuncs::mouseScrollCallback([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) noexcept
     {
         if (xoffset != 0.0)
-            EventManager::getInstance().emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Horizontal, .delta = xoffset });
+            eventManager.emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Horizontal, .delta = xoffset });
 
         if (yoffset != 0.0)
-            EventManager::getInstance().emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Vertical, .delta = yoffset });
+            eventManager.emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Vertical, .delta = yoffset });
+
+        //TODO:
+        //Input::getInstance().handleEvent(keycode, state);
     }
 
     void EventCallbackFuncs::cursorPositionCallback([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) noexcept
     {
-        EventManager::getInstance().emplace(InputEvent::Mouse::Move{ .position = { xpos, ypos } });
+        eventManager.emplace(InputEvent::Mouse::Move{ .position = { xpos, ypos } });
     }
 
     void EventCallbackFuncs::joystickCallback(int jid,  int event) noexcept
     {
         if (event == GLFW_CONNECTED)
         {
-            EventManager::getInstance().emplace(InputEvent::Joystick::Connected{ .id = U32(jid) });
-            InputManager::getInstance().addJoystick(U32(jid));
+            eventManager.emplace(InputEvent::Joystick::Connected{ .id = U32(jid) });
+            inputManager.addJoystick(U32(jid));
         }
         else if (event == GLFW_DISCONNECTED)
         {
-            EventManager::getInstance().emplace(InputEvent::Joystick::Disconnected{ .id = U32(jid) });
-            InputManager::getInstance().removeJoystick(U32(jid));
+            eventManager.emplace(InputEvent::Joystick::Disconnected{ .id = U32(jid) });
+            inputManager.removeJoystick(U32(jid));
         }
     }
 
@@ -214,6 +215,6 @@ namespace ikk
             files.emplace_back(paths[i]);
 
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        EventManager::getInstance().emplace(WindowEvent::FileDropped{ .window = ptr, .paths = std::move(files) });
+        eventManager.emplace(WindowEvent::FileDropped{ .window = ptr, .paths = std::move(files) });
     }
 }

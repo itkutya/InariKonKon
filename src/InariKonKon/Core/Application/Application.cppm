@@ -17,7 +17,6 @@ import :Layer;
 
 import Time;
 import Clock;
-import Color;
 
 export namespace ikk
 {
@@ -35,7 +34,7 @@ export namespace ikk
 
         ~Application() noexcept = default;
 
-        void run(const Color& clearColor = Color::Miku) noexcept;
+        void run() noexcept;
 
         template<LayerType T>
         void attach(T&& layer) noexcept;
@@ -50,7 +49,7 @@ export namespace ikk
 
         void processEvents() const noexcept;
         void update() noexcept;
-        void render(const Color& clearColor) const noexcept;
+        void render() const noexcept;
     };
 }
 
@@ -62,13 +61,13 @@ namespace ikk
         this->m_deltaTime.restart();
     }
 
-    void Application::run(const Color& clearColor) noexcept
+    void Application::run() noexcept
     {
-        while (this->m_window.shouldClose() == false && this->m_window.getRenderer().isValid() == true)
+        while (this->m_window.shouldClose() == false && this->m_window.getRenderer()->isValid() == true)
         {
             this->processEvents();
             this->update();
-            this->render(clearColor);
+            this->render();
         }
     }
 
@@ -82,13 +81,12 @@ namespace ikk
     {
         this->m_window.pollEvents();
 
-        EventManager& eventStack = EventManager::getInstance();
-        while (eventStack.isEmpty() == false)
+        while (eventManager.isEmpty() == false)
         {
-            const Event& event = eventStack.top();
+            const Event& event = eventManager.top();
             for (const std::shared_ptr<Layer>& layer : this->m_layers)
                 layer->onEvent(event);
-            eventStack.pop();
+            eventManager.pop();
         }
     }
 
@@ -99,10 +97,10 @@ namespace ikk
             layer->onUpdate(dt);
     }
 
-    void Application::render(const Color& clearColor) const noexcept
+    void Application::render() const noexcept
     {
         for (const std::shared_ptr<Layer>& layer : this->m_layers)
             layer->onRender(this->m_window);
-        this->m_window.render(clearColor);
+        this->m_window.render();
     }
 }

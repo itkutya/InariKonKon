@@ -6,7 +6,7 @@ module;
 export module Quaternion;
 
 import Rotation;
-import Math;
+import Angle;
 import Mat;
 import Vec;
 

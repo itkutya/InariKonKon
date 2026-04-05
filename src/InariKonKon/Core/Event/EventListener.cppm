@@ -7,8 +7,6 @@ export module Core:EventListener;
 
 export namespace ikk
 {
-    class Event;
-
     template<class T>
     class EventListener
     {
@@ -32,7 +30,7 @@ export namespace ikk
 
         [[nodiscard]] static const std::vector<EventListener<T>*>& getListeners() noexcept;
 
-        friend Event;
+        friend class Event;
     };
 }
 

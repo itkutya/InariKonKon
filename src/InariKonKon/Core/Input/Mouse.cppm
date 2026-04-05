@@ -3,7 +3,7 @@ module;
 #include <string_view>
 #include <cstdint>
 
-export module Input:Mouse;
+export module Core:Mouse;
 
 import NonConstructible;
 
@@ -31,6 +31,8 @@ export namespace ikk
             Horizontal,
             Vertical
         };
+
+        using enum Button;
 
         [[nodiscard]] static constexpr std::string_view toString(Button button) noexcept;
         [[nodiscard]] static constexpr std::string_view toString(Wheel wheel) noexcept;

@@ -1,11 +1,11 @@
 module;
 
-#include <algorithm>
+#include <cstdint>
 #include <chrono>
 
 export module Time;
 
-import Utility;
+import NumericCasts;
 
 export namespace ikk
 {

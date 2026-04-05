@@ -4,7 +4,7 @@ module;
 #include <string_view>
 #include <cstdint>
 
-export module Input:Keyboard;
+export module Core:Keyboard;
 
 import NonConstructible;
 
@@ -138,6 +138,8 @@ export namespace ikk
             LaunchApplication1,
             LaunchApplication2
         };
+
+        using enum KeyCode;
 
         [[nodiscard]] static constexpr std::string_view toString(KeyCode keycode) noexcept;
 

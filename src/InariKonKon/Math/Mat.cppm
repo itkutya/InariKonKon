@@ -8,11 +8,16 @@ module;
 
 export module Mat;
 
-import Math;
+import Number;
 import Vec;
 
 export namespace ikk
 {
+    enum struct [[nodiscard]] MatrixOrdering : std::uint8_t
+    {
+        RowMajor, ColumnMajor
+    };
+
     template<std::size_t Rows, std::size_t Cols, Number T, MatrixOrdering O = MatrixOrdering::RowMajor>
     class [[nodiscard]] Mat final
     {

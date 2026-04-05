@@ -10,9 +10,12 @@ export module Core:Event;
 
 import :EventCallback;
 import :EventListener;
+import :Keyboard;
+import :Joystick;
+import :Mouse;
+import :Input;
 
 import NonConstructible;
-import Input;
 import Flag;
 import Vec;
 
@@ -30,7 +33,7 @@ export namespace ikk
     class [[nodiscard]] Event final
     {
     public:
-        struct Window : public NonConstructible
+        struct Window final : public NonConstructible
         {
             struct Closed
             {
@@ -115,7 +118,7 @@ export namespace ikk
             };
         };
 
-        struct Monitor : public NonConstructible
+        struct Monitor final : public NonConstructible
         {
             struct Connected
             {
@@ -128,7 +131,7 @@ export namespace ikk
             };
         };
 
-        struct Input
+        struct Input final : public NonConstructible
         {
             struct Text
             {
@@ -139,15 +142,15 @@ export namespace ikk
             {
                 ikk::Keyboard::KeyCode  keycode;
                 ikk::Keyboard::ScanCode scancode;
-                ikk::Input::State       state;
+                ikk::Input::Action       state;
             };
 
-            struct Mouse
+            struct Mouse final : public NonConstructible
             {
                 struct Button
                 {
                     ikk::Mouse::Button  button;
-                    ikk::Input::State   state;
+                    ikk::Input::Action   state;
                 };
 
                 struct Wheel
@@ -162,7 +165,7 @@ export namespace ikk
                 };
             };
 
-            struct Joystick
+            struct Joystick final : public NonConstructible
             {
                 struct Connected
                 {
@@ -178,21 +181,21 @@ export namespace ikk
                 {
                     ikk::Joystick::ID       id;
                     ikk::Joystick::Button   button;
-                    ikk::Input::State       state;
+                    ikk::Input::Action       state;
                 };
 
                 struct Axis
                 {
                     ikk::Joystick::ID   id;
                     ikk::Joystick::Axis axis;
-                    ikk::Input::State   state;
+                    ikk::Input::Action   state;
                 };
 
                 struct Hat
                 {
                     ikk::Joystick::ID           id;
                     Flag<ikk::Joystick::Hat>    hat;
-                    ikk::Input::State           state;
+                    ikk::Input::Action           state;
                 };
             };
         };

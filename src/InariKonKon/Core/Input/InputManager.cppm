@@ -5,10 +5,11 @@ module;
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
-export module InputManager;
+export module Core:InputManager;
+
+import :PhysicalJoystick;
 
 import Singleton;
-import Input;
 
 export namespace ikk
 {
@@ -29,6 +30,8 @@ export namespace ikk
 
         [[nodiscard]] auto findJoystick(Joystick::ID id) const noexcept;
     };
+
+    inline InputManager& inputManager = InputManager::getInstance();
 }
 
 namespace ikk

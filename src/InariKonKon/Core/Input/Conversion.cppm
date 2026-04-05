@@ -5,19 +5,22 @@ module;
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
-export module Conversion;
+export module Core:Conversion;
 
-import NonConstructible;
-import Input;
+import :Keyboard;
+import :Mouse;
+import :Input;
+
+import NumericCasts;
 
 export namespace ikk
 {
     //TODO: Rename to something else...
-    class Conversion : public NonConstructible
+    class Conversion final : public NonConstructible
     {
     public:
-        [[nodiscard]] static constexpr Input::State fromGLFWAction(std::int32_t action) noexcept;
-        [[nodiscard]] static constexpr std::int32_t toGLFWAction(Input::State type) noexcept;
+        [[nodiscard]] static constexpr Input::Action fromGLFWAction(std::int32_t action) noexcept;
+        [[nodiscard]] static constexpr std::int32_t toGLFWAction(Input::Action type) noexcept;
 
         [[nodiscard]] static constexpr std::int32_t toGLFWKeyCode(Keyboard::KeyCode keycode) noexcept;
         [[nodiscard]] static constexpr Keyboard::KeyCode fromGLFWKeyCode(std::int32_t keycode) noexcept;
@@ -29,25 +32,25 @@ export namespace ikk
 
 namespace ikk
 {
-    constexpr Input::State Conversion::fromGLFWAction(std::int32_t action) noexcept
+    constexpr Input::Action Conversion::fromGLFWAction(std::int32_t action) noexcept
     {
         switch (action)
         {
-            case GLFW_PRESS:    return Input::State::Press;
-            case GLFW_RELEASE:  return Input::State::Release;
-            case GLFW_REPEAT:   return Input::State::Repeat;
-            default:            return Input::State::Unknown;
+            case GLFW_PRESS:    return Input::Action::Press;
+            case GLFW_RELEASE:  return Input::Action::Release;
+            case GLFW_REPEAT:   return Input::Action::Repeat;
+            default:            return Input::Action::Unknown;
         }
     }
 
-    constexpr std::int32_t Conversion::toGLFWAction(Input::State type) noexcept
+    constexpr std::int32_t Conversion::toGLFWAction(Input::Action type) noexcept
     {
         switch (type)
         {
-            case Input::State::Unknown:    return GLFW_KEY_UNKNOWN;
-            case Input::State::Press:      return GLFW_PRESS;
-            case Input::State::Release:    return GLFW_RELEASE;
-            case Input::State::Repeat:     return GLFW_REPEAT;
+            case Input::Action::Unknown:    return GLFW_KEY_UNKNOWN;
+            case Input::Action::Press:      return GLFW_PRESS;
+            case Input::Action::Release:    return GLFW_RELEASE;
+            case Input::Action::Repeat:     return GLFW_REPEAT;
         }
         return GLFW_KEY_UNKNOWN;
     }

@@ -6,7 +6,7 @@ module;
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
-export module Input:Joystick;
+export module Core:Joystick;
 
 import NonConstructible;
 
@@ -61,6 +61,8 @@ export namespace ikk
             DownRight   = Down | Right,
             DownLeft    = Down | Left
         };
+
+        using enum Button;
 
         [[nodiscard]] static constexpr std::string_view toString(Button button) noexcept;
         [[nodiscard]] static constexpr std::string_view toString(Axis axis) noexcept;

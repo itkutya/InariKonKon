@@ -13,7 +13,8 @@ export module Core:Vulkan;
 
 import :Renderer;
 
-import Utility;
+import DebugFeatures;
+import NumericCasts;
 import Shader;
 import Log;
 
@@ -179,15 +180,10 @@ namespace ikk
         this->m_commandBuffers[this->m_imageIndex].begin(beginInfo);
 
         const vk::ClearValue color{std::array<float, 4>{
-            F32(clearColor.r.value) / F32(std::numeric_limits<std::uint8_t>::max()),
-            F32(clearColor.g.value) / F32(std::numeric_limits<std::uint8_t>::max()),
-            F32(clearColor.b.value) / F32(std::numeric_limits<std::uint8_t>::max()),
-            F32(clearColor.a.value) / F32(std::numeric_limits<std::uint8_t>::max()) }};
-        // const vk::ClearValue color{std::array<float, 4>{
-        //     F32(clearColor.r.value.value()),
-        //     F32(clearColor.g.value.value()),
-        //     F32(clearColor.b.value.value()),
-        //     F32(clearColor.a.value.value()) }};
+            F32(clearColor.r) / F32(std::numeric_limits<std::uint8_t>::max()),
+            F32(clearColor.g) / F32(std::numeric_limits<std::uint8_t>::max()),
+            F32(clearColor.b) / F32(std::numeric_limits<std::uint8_t>::max()),
+            F32(clearColor.a) / F32(std::numeric_limits<std::uint8_t>::max()) }};
 
         vk::RenderPassBeginInfo renderPassInfo{};
         renderPassInfo.renderPass = this->m_renderPass;

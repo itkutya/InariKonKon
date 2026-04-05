@@ -11,7 +11,7 @@ module;
 
 export module Vec;
 
-import Math;
+import Number;
 
 export namespace ikk
 {

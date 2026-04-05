@@ -5,14 +5,12 @@ module;
 
 export module Rotation;
 
-import Math;
+import Number;
+import Angle;
 
 export namespace ikk
 {
-    template<template<class> class T, class F>
-    concept AngleNumber = std::floating_point<F> && (std::is_same_v<T<F>, Degree<F>> || std::is_same_v<T<F>, Radian<F>>);
-
-    template<template<class> class T, std::floating_point F> requires (AngleNumber<T, F>)
+    template<template<class> class T, std::floating_point F> requires (std::is_same<T<F>, Degree<F>>::value || std::is_same<T<F>, Radian<F>>::value)
     struct [[nodiscard]] Rotation
     {
         T<F> yaw{};

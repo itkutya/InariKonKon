@@ -28,6 +28,8 @@ export namespace ikk
     private:
         std::stack<Event> m_events;
     };
+
+    inline EventManager& eventManager = EventManager::getInstance();
 }
 
 namespace ikk

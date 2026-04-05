@@ -10,10 +10,8 @@ import NonConstructible;
 
 export namespace ikk
 {
-    class Event;
-
     template<class T>
-    class EventCallback : public NonConstructible
+    class EventCallback final : public NonConstructible
     {
     public:
         using CallbackFunc = std::function<void(const T&)>;
@@ -26,7 +24,7 @@ export namespace ikk
 
         [[nodiscard]] static const std::vector<CallbackFunc>& getCallbacks() noexcept;
 
-        friend Event;
+        friend class Event;
     };
 }
 

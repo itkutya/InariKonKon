@@ -44,32 +44,28 @@ export namespace ikk
         template<class T, class... Args> requires (std::is_base_of<Renderer::Type, T>::value)
         void create(Args&&... args) noexcept;
 
-        [[nodiscard]] bool isValid() const noexcept;
-
-        void beginRender(const Color& clearColor) const noexcept;
-        void endRender() const noexcept;
+        [[nodiscard]] const std::shared_ptr<Type>& get() const noexcept;
+        [[nodiscard]] std::shared_ptr<Type>& get() noexcept;
     private:
         std::shared_ptr<Type> m_renerer = nullptr;
     };
+}
 
+namespace ikk
+{
     template<class T, class... Args> requires (std::is_base_of<Renderer::Type, T>::value)
     void Renderer::create(Args&&... args) noexcept
     {
         this->m_renerer = std::make_shared<T>(std::forward<Args>(args)...);
     }
 
-    bool Renderer::isValid() const noexcept
+    const std::shared_ptr<Renderer::Type>& Renderer::get() const noexcept
     {
-        return this->m_renerer->isValid();
+        return this->m_renerer;
     }
 
-    void Renderer::beginRender(const Color& clearColor) const noexcept
+    std::shared_ptr<Renderer::Type>& Renderer::get() noexcept
     {
-        this->m_renerer->beginRender(clearColor);
-    }
-
-    void Renderer::endRender() const noexcept
-    {
-        this->m_renerer->endRender();
+        return this->m_renerer;
     }
 }
