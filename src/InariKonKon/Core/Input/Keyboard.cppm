@@ -145,8 +145,10 @@ export namespace ikk
 
         [[nodiscard]] static constexpr ScanCode toScanCode(KeyCode keycode) noexcept;
         [[nodiscard]] static constexpr KeyCode toKeyCode(ScanCode scancode) noexcept;
-
+    private:
         [[nodiscard]] static std::unordered_map<Keyboard::ScanCode, Keyboard::KeyCode>& getScanCodeMapping() noexcept;
+
+        friend class EventCallbackFuncs;
     };
 }
 

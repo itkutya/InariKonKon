@@ -6,12 +6,28 @@ public:
     MenuLayer() noexcept
     {
         //TODO: Error handeling...
-        ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::A, ikk::Input::Press);
-        ikk::Input.bind("Move Left", ikk::Keyboard::A);
-
+        ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::A);
+        ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::A);
+        ikk::Input.bind("Move Up", ikk::Keyboard::KeyCode::A);
+        ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::D);
         ikk::Input.onAction("Move Left",
-            []() noexcept
+            [](ikk::Keyboard::KeyCode keycode, ikk::Input::Action action) noexcept
             {
+                ikk::Print("Keycode: {}", ikk::Keyboard::toString(keycode));
+            });
+
+        ikk::Input.bind("Shoot", ikk::Mouse::Left);
+        ikk::Input.onAction("Shoot",
+            [](ikk::Mouse::Button button, ikk::Input::Action action) noexcept
+            {
+                ikk::Print("Mouse button: {}", ikk::Mouse::toString(button));
+            });
+
+        ikk::Input.bind("Scroll", ikk::Mouse::Wheel::Vertical);
+        ikk::Input.onAction("Scroll",
+            [](ikk::Mouse::Wheel wheel, double delta) noexcept
+            {
+                ikk::Print("Mouse wheel: {}\tScroll delta: {}", ikk::Mouse::toString(wheel), delta);
             });
     }
 

@@ -128,6 +128,7 @@ namespace ikk
     void Window::pollEvents() const noexcept
     {
         if (this->m_window != nullptr) glfwPollEvents();
+        //TODO: Handle different events that are not handeld by glfw..., like joystick...
     }
 
     void Window::render() const noexcept

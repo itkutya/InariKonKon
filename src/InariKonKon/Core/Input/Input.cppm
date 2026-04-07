@@ -2,13 +2,17 @@ module;
 
 #include <string_view>
 #include <functional>
+#include <utility>
 #include <cstdint>
-#include <vector>
 #include <string>
+#include <ranges>
+#include <tuple>
 
 export module Core:Input;
 
+import FunctionTraits;
 import Singleton;
+import VectorMap;
 
 export namespace ikk
 {
@@ -18,7 +22,8 @@ export namespace ikk
 
         Input() noexcept = default;
     public:
-        using Callback = std::function<void()>;
+        template<class InputType, class... Args>
+        using Callback = std::function<void(InputType, Args...)>;
 
         enum struct [[nodiscard]] Action : std::int8_t
         {
@@ -34,17 +39,20 @@ export namespace ikk
 
         [[nodiscard]] static constexpr std::string_view toString(Action type) noexcept;
 
-        //TODO:
-        template<class T>
-        void bind(std::string&& name, T input, Action action = Action::Press) noexcept;
+        template<class InputType>
+        void bind(const std::string& name, InputType input) noexcept;
 
-        void onAction(const std::string& name, Callback&& func) noexcept;
+        template<class FuncType>
+        void onAction(const std::string& name, FuncType&& func) noexcept;
     private:
-        std::vector<std::string> m_actions;
-        std::vector<Callback> m_callbacks;
+        template<class InputType>
+        VectorMap<std::string, std::vector<InputType>>& getBindins() const noexcept;
 
-        template<class T>
-        void handleEvent(T input, Action action) noexcept;
+        template<class InputType, class... Args>
+        VectorMap<std::string, Callback<InputType, Args...>>& getCallbacks() const noexcept;
+
+        template<class InputType, class... Args>
+        void handleEvent(InputType input, Args&&... action) noexcept;
 
         friend class EventCallbackFuncs;
     };
@@ -66,19 +74,61 @@ namespace ikk
         return "Unknown";
     }
 
-    template <class T>
-    void Input::bind(std::string&& name, T input, Action action) noexcept
+    template<class InputType>
+    void Input::bind(const std::string& name, InputType input) noexcept
     {
-        this->m_actions.emplace_back(std::move(name));
+        auto& bindings = this->getBindins<InputType>();
+        auto* found = bindings.find(name);
+        if (found == nullptr)
+            bindings.insert(name, std::vector<InputType>{input});
+        else
+        {
+            for (const auto& i : (*found)) if (i == input) return;
+            found->emplace_back(input);
+        }
     }
 
-    void Input::onAction(const std::string& name, Callback&& func) noexcept
+    template<class FuncType>
+    void Input::onAction(const std::string& name, FuncType&& func) noexcept
     {
-        this->m_callbacks.emplace_back(std::move(func));
+        using Traits = FunctionTraits<std::decay_t<FuncType>>;
+        [this]<typename F, typename... Args>(const std::string& n, F&& f, [[maybe_unused]] std::tuple<Args...>)
+        {
+            if (auto& callbacks = this->getCallbacks<Args...>(); callbacks.find(n) == nullptr)
+                callbacks.insert(n, std::forward<F>(f));
+        }(name, std::forward<FuncType>(func), typename Traits::ArgsTuple{});
     }
 
-    template <class T>
-    void Input::handleEvent(T input, Action action) noexcept
+    template<class InputType>
+    VectorMap<std::string, std::vector<InputType>>& Input::getBindins() const noexcept
     {
+        static VectorMap<std::string, std::vector<InputType>> instance{};
+        return instance;
+    }
+
+    template<class InputType, class... Args>
+    VectorMap<std::string, Input::Callback<InputType, Args...>>& Input::getCallbacks() const noexcept
+    {
+        static VectorMap<std::string, Input::Callback<InputType, Args...>> instance{};
+        return instance;
+    }
+
+    template<class InputType, class... Args>
+    void Input::handleEvent(InputType input, Args&&... action) noexcept
+    {
+        const auto& bindings = this->getBindins<InputType>();
+        const auto it = std::ranges::find_if(bindings,
+            [&input](const auto& pair)
+            {
+                for (const auto& i : pair.second) if (i == input) return true;
+                return false;
+            });
+
+        if (it == bindings.end())
+            return;
+
+        const auto& callbacks = this->getCallbacks<InputType, typename std::decay<Args>::type...>();
+        if (const auto* callback = callbacks.find(it->first); callback != nullptr)
+            (*callback)(input, std::forward<Args>(action)...);
     }
 }

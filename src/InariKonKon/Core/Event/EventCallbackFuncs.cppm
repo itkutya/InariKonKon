@@ -86,7 +86,9 @@ namespace ikk
     void EventCallbackFuncs::framebufferResizeCallback(GLFWwindow* window, int width, int height) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        eventManager.emplace(WindowEvent::FramebufferResized{ .window = ptr, .width = U32(width), .height = U32(height) });
+        eventManager.emplace(WindowEvent::FramebufferResized{
+            .window = ptr, .width = U32(width), .height = U32(height)
+        });
     }
 
     void EventCallbackFuncs::windowContentScaleCallback(GLFWwindow* window, float xscale, float yscale) noexcept
@@ -104,28 +106,22 @@ namespace ikk
     void EventCallbackFuncs::windowIconifyCallback(GLFWwindow* window, int iconified) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        if (iconified == GLFW_TRUE)
-            eventManager.emplace(WindowEvent::Iconified{ .window = ptr });
-        else if (iconified == GLFW_FALSE)
-            eventManager.emplace(WindowEvent::UnIconified{ .window = ptr });
+        if (iconified == GLFW_TRUE) eventManager.emplace(WindowEvent::Iconified{ .window = ptr });
+        else if (iconified == GLFW_FALSE) eventManager.emplace(WindowEvent::UnIconified{ .window = ptr });
     }
 
     void EventCallbackFuncs::windowMaximizeCallback(GLFWwindow* window, int maximized) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        if (maximized == GLFW_TRUE)
-            eventManager.emplace(WindowEvent::Maximized{ .window = ptr });
-        else if (maximized == GLFW_FALSE)
-            eventManager.emplace(WindowEvent::Minimized{ .window = ptr });
+        if (maximized == GLFW_TRUE) eventManager.emplace(WindowEvent::Maximized{ .window = ptr });
+        else if (maximized == GLFW_FALSE) eventManager.emplace(WindowEvent::Minimized{ .window = ptr });
     }
 
     void EventCallbackFuncs::windowFocusCallback(GLFWwindow* window, int focused) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        if (focused == GLFW_TRUE)
-            eventManager.emplace(WindowEvent::FocusGained{ .window = ptr });
-        else if (focused == GLFW_FALSE)
-            eventManager.emplace(WindowEvent::FocusLost{ .window = ptr });
+        if (focused == GLFW_TRUE) eventManager.emplace(WindowEvent::FocusGained{ .window = ptr });
+        else if (focused == GLFW_FALSE) eventManager.emplace(WindowEvent::FocusLost{ .window = ptr });
     }
 
     void EventCallbackFuncs::windowRefreshCallback(GLFWwindow* window) noexcept
@@ -136,19 +132,19 @@ namespace ikk
 
     void EventCallbackFuncs::monitorCallback(GLFWmonitor* monitor, int event) noexcept
     {
-        if (event == GLFW_CONNECTED)
-            eventManager.emplace(Event::Monitor::Connected{ .monitor = reinterpret_cast<Monitor*>(monitor) });
-        else if (event == GLFW_DISCONNECTED)
-            eventManager.emplace(Event::Monitor::Disconnected{ .monitor = reinterpret_cast<Monitor*>(monitor) });
+        if (event == GLFW_CONNECTED) eventManager.emplace(Event::Monitor::Connected{
+            .monitor = reinterpret_cast<Monitor*>(monitor)
+        });
+        else if (event == GLFW_DISCONNECTED) eventManager.emplace(Event::Monitor::Disconnected{
+            .monitor = reinterpret_cast<Monitor*>(monitor)
+        });
     }
 
     void EventCallbackFuncs::cursorEnterCallback(GLFWwindow* window, int entered) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        if (entered == GLFW_TRUE)
-            eventManager.emplace(WindowEvent::CursorEntered{ .window = ptr });
-        else if (entered == GLFW_FALSE)
-            eventManager.emplace(WindowEvent::CursorLeft{ .window = ptr });
+        if (entered == GLFW_TRUE) eventManager.emplace(WindowEvent::CursorEntered{ .window = ptr });
+        else if (entered == GLFW_FALSE) eventManager.emplace(WindowEvent::CursorLeft{ .window = ptr });
     }
 
     void EventCallbackFuncs::characterCallback([[maybe_unused]] GLFWwindow* window, unsigned int codepoint) noexcept
@@ -179,13 +175,16 @@ namespace ikk
     void EventCallbackFuncs::mouseScrollCallback([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) noexcept
     {
         if (xoffset != 0.0)
+        {
             eventManager.emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Horizontal, .delta = xoffset });
+            Input::getInstance().handleEvent(Mouse::Wheel::Horizontal, xoffset);
+        }
 
         if (yoffset != 0.0)
+        {
             eventManager.emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Vertical, .delta = yoffset });
-
-        //TODO:
-        //Input::getInstance().handleEvent(keycode, state);
+            Input::getInstance().handleEvent(Mouse::Wheel::Vertical, yoffset);
+        }
     }
 
     void EventCallbackFuncs::cursorPositionCallback([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) noexcept
@@ -193,7 +192,7 @@ namespace ikk
         eventManager.emplace(InputEvent::Mouse::Move{ .position = { xpos, ypos } });
     }
 
-    void EventCallbackFuncs::joystickCallback(int jid,  int event) noexcept
+    void EventCallbackFuncs::joystickCallback(int jid, int event) noexcept
     {
         if (event == GLFW_CONNECTED)
         {
@@ -211,8 +210,7 @@ namespace ikk
     {
         std::vector<std::filesystem::path> files{};
         files.reserve(static_cast<std::size_t>(count));
-        for (std::size_t i = 0; i < static_cast<std::size_t>(count); ++i)
-            files.emplace_back(paths[i]);
+        for (std::size_t i = 0; i < static_cast<std::size_t>(count); ++i) files.emplace_back(paths[i]);
 
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
         eventManager.emplace(WindowEvent::FileDropped{ .window = ptr, .paths = std::move(files) });
