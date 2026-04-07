@@ -14,6 +14,9 @@ import Singleton;
 export namespace ikk
 {
     //TODO: Rename or add other stuff...
+    // * like commulative delta for scrolling
+    // * input polling for events that glfw does not have them
+    // * Other stuff...
     class InputManager final : public Singleton<InputManager>
     {
         friend class Singleton<InputManager>;
