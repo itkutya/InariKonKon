@@ -10,7 +10,8 @@ export module Core:EventCallbackFuncs;
 
 import :InputManager;
 import :EventManager;
-import :GLFWMapper;
+import :Keyboard;
+import :Mouse;
 import :Event;
 import :Input;
 
@@ -155,10 +156,10 @@ namespace ikk
     void EventCallbackFuncs::keyInputCallback([[maybe_unused]] GLFWwindow* window, int key, int scancode, int action, [[maybe_unused]] int mods) noexcept
     {
         if (auto& mapping = Keyboard::getScanCodeMapping(); mapping.contains(scancode) == false)
-            mapping.emplace(scancode, GLFWMapper::fromGLFWKeyCode(key));
+            mapping.emplace(scancode, Keyboard::fromGLFWKeyCode(key));
 
-        const Keyboard::KeyCode keycode = GLFWMapper::fromGLFWKeyCode(key);
-        const Input::Action state = GLFWMapper::fromGLFWAction(action);
+        const Keyboard::KeyCode keycode = Keyboard::fromGLFWKeyCode(key);
+        const Input::Action state = Input::fromGLFWAction(action);
         eventManager.emplace(InputEvent::Keyboard{ .keycode = keycode, .scancode = scancode, .state = state });
         Input.handleEvent(keycode, state);
         Input.handleEvent(scancode, state);
@@ -166,8 +167,8 @@ namespace ikk
 
     void EventCallbackFuncs::mouseButtonCallback([[maybe_unused]] GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) noexcept
     {
-        const Mouse::Button mButton = GLFWMapper::fromGLFWButton(button);
-        const Input::Action state = GLFWMapper::fromGLFWAction(action);
+        const Mouse::Button mButton = Mouse::fromGLFWButton(button);
+        const Input::Action state = Input::fromGLFWAction(action);
         eventManager.emplace(InputEvent::Mouse::Button{ .button = mButton, .state = state });
         Input.handleEvent(mButton, state);
     }

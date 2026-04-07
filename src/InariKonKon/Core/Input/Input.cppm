@@ -8,6 +8,9 @@ module;
 #include <ranges>
 #include <tuple>
 
+#define GLFW_INCLUDE_NONE
+#include "GLFW/glfw3.h"
+
 export module Core:Input;
 
 import FunctionTraits;
@@ -53,6 +56,9 @@ export namespace ikk
 
         template<class InputType, class... Args>
         void handleEvent(InputType input, Args&&... action) noexcept;
+
+        [[nodiscard]] static constexpr Input::Action fromGLFWAction(std::int32_t action) noexcept;
+        [[nodiscard]] static constexpr std::int32_t toGLFWAction(Input::Action type) noexcept;
 
         friend class EventCallbackFuncs;
     };
@@ -130,5 +136,28 @@ namespace ikk
         const auto& callbacks = this->getCallbacks<InputType, typename std::decay<Args>::type...>();
         if (const auto* callback = callbacks.find(it->first); callback != nullptr)
             (*callback)(input, std::forward<Args>(action)...);
+    }
+
+    constexpr Input::Action Input::fromGLFWAction(std::int32_t action) noexcept
+    {
+        switch (action)
+        {
+        case GLFW_PRESS:    return Input::Action::Press;
+        case GLFW_RELEASE:  return Input::Action::Release;
+        case GLFW_REPEAT:   return Input::Action::Repeat;
+        default:            return Input::Action::Unknown;
+        }
+    }
+
+    constexpr std::int32_t Input::toGLFWAction(Input::Action type) noexcept
+    {
+        switch (type)
+        {
+        case Input::Action::Unknown:    return GLFW_KEY_UNKNOWN;
+        case Input::Action::Press:      return GLFW_PRESS;
+        case Input::Action::Release:    return GLFW_RELEASE;
+        case Input::Action::Repeat:     return GLFW_REPEAT;
+        }
+        return GLFW_KEY_UNKNOWN;
     }
 }
