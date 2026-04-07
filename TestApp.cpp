@@ -7,13 +7,19 @@ public:
     {
         //TODO: Error handeling...
         ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::A);
-        ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::A);
         ikk::Input.bind("Move Up", ikk::Keyboard::KeyCode::A);
         ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::D);
         ikk::Input.onAction("Move Left",
             [](ikk::Keyboard::KeyCode keycode, ikk::Input::Action action) noexcept
             {
                 ikk::Print("Keycode: {}", ikk::Keyboard::toString(keycode));
+            });
+
+        ikk::Input.bind("Move Left", ikk::Keyboard::toScanCode(ikk::Keyboard::KeyCode::A));
+        ikk::Input.onAction("Move Left",
+            [](ikk::Keyboard::ScanCode scancode, ikk::Input::Action action) noexcept
+            {
+                ikk::Print("ScanCode: {}", ikk::Keyboard::toString(ikk::Keyboard::toKeyCode(scancode)));
             });
 
         ikk::Input.bind("Shoot", ikk::Mouse::Left);

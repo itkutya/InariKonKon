@@ -154,7 +154,6 @@ namespace ikk
 
     void EventCallbackFuncs::keyInputCallback([[maybe_unused]] GLFWwindow* window, int key, int scancode, int action, [[maybe_unused]] int mods) noexcept
     {
-        //TODO: Fix later...
         if (auto& mapping = Keyboard::getScanCodeMapping(); mapping.contains(scancode) == false)
             mapping.emplace(scancode, GLFWMapper::fromGLFWKeyCode(key));
 
@@ -162,6 +161,7 @@ namespace ikk
         const Input::Action state = GLFWMapper::fromGLFWAction(action);
         eventManager.emplace(InputEvent::Keyboard{ .keycode = keycode, .scancode = scancode, .state = state });
         Input.handleEvent(keycode, state);
+        Input.handleEvent(scancode, state);
     }
 
     void EventCallbackFuncs::mouseButtonCallback([[maybe_unused]] GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) noexcept
