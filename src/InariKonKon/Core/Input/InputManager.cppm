@@ -13,6 +13,7 @@ import Singleton;
 
 export namespace ikk
 {
+    //TODO: Rename or add other stuff...
     class InputManager final : public Singleton<InputManager>
     {
         friend class Singleton<InputManager>;

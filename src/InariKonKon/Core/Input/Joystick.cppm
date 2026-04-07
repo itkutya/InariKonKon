@@ -8,6 +8,8 @@ module;
 
 export module Core:Joystick;
 
+import :Input;
+
 import NonConstructible;
 
 export namespace ikk
@@ -82,6 +84,15 @@ export namespace ikk
 
 namespace ikk
 {
+    template<>
+    struct isInputType<Joystick::Button> : std::true_type {};
+
+    template<>
+    struct isInputType<Joystick::Axis> : std::true_type {};
+
+    template<>
+    struct isInputType<Joystick::Hat> : std::true_type {};
+
     constexpr std::string_view Joystick::toString(Button button) noexcept
     {
         switch (button)

@@ -1,5 +1,6 @@
 module;
 
+#include <type_traits>
 #include <string_view>
 #include <functional>
 #include <utility>
@@ -17,6 +18,15 @@ import FunctionTraits;
 import Singleton;
 import VectorMap;
 
+namespace ikk
+{
+    template<typename T>
+    struct isInputType : std::false_type {};
+
+    template<class T>
+    concept InputType = isInputType<T>::value;
+}
+
 export namespace ikk
 {
     class Input final : public Singleton<Input>
@@ -25,8 +35,8 @@ export namespace ikk
 
         Input() noexcept = default;
     public:
-        template<class InputType, class... Args>
-        using Callback = std::function<void(InputType, Args...)>;
+        template<InputType T, class... Args>
+        using Callback = std::function<void(T, Args...)>;
 
         enum struct [[nodiscard]] Action : std::int8_t
         {
@@ -42,20 +52,20 @@ export namespace ikk
 
         [[nodiscard]] static constexpr std::string_view toString(Action type) noexcept;
 
-        template<class InputType>
-        void bind(const std::string& name, InputType input) noexcept;
+        template<InputType T>
+        void bind(const std::string& name, T input) noexcept;
 
         template<class FuncType>
         void onAction(const std::string& name, FuncType&& func) noexcept;
     private:
-        template<class InputType>
-        VectorMap<std::string, std::vector<InputType>>& getBindins() const noexcept;
+        template<InputType T>
+        VectorMap<std::string, std::vector<T>>& getBindins() const noexcept;
 
-        template<class InputType, class... Args>
-        VectorMap<std::string, Callback<InputType, Args...>>& getCallbacks() const noexcept;
+        template<InputType T, class... Args>
+        VectorMap<std::string, Callback<T, Args...>>& getCallbacks() const noexcept;
 
-        template<class InputType, class... Args>
-        void handleEvent(InputType input, Args&&... action) noexcept;
+        template<InputType T, class... Args>
+        void handleEvent(T input, Args&&... action) noexcept;
 
         [[nodiscard]] static constexpr Input::Action fromGLFWAction(std::int32_t action) noexcept;
         [[nodiscard]] static constexpr std::int32_t toGLFWAction(Input::Action type) noexcept;
@@ -80,13 +90,13 @@ namespace ikk
         return "Unknown";
     }
 
-    template<class InputType>
-    void Input::bind(const std::string& name, InputType input) noexcept
+    template<InputType T>
+    void Input::bind(const std::string& name, T input) noexcept
     {
-        auto& bindings = this->getBindins<InputType>();
-        auto* found = bindings.find(name);
+        auto& bindings = this->getBindins<T>();
+        std::vector<T>* found = bindings.find(name);
         if (found == nullptr)
-            bindings.insert(name, std::vector<InputType>{input});
+            bindings.insert(name, std::vector<T>{input});
         else
         {
             for (const auto& i : (*found)) if (i == input) return;
@@ -100,29 +110,30 @@ namespace ikk
         using Traits = FunctionTraits<std::decay_t<FuncType>>;
         [this]<typename F, typename... Args>(const std::string& n, F&& f, [[maybe_unused]] std::tuple<Args...>)
         {
+            static_assert(std::is_invocable<FuncType, Args...>::value == true, "Input.onAction must be invokable");
             if (auto& callbacks = this->getCallbacks<Args...>(); callbacks.find(n) == nullptr)
                 callbacks.insert(n, std::forward<F>(f));
         }(name, std::forward<FuncType>(func), typename Traits::ArgsTuple{});
     }
 
-    template<class InputType>
-    VectorMap<std::string, std::vector<InputType>>& Input::getBindins() const noexcept
+    template<InputType T>
+    VectorMap<std::string, std::vector<T>>& Input::getBindins() const noexcept
     {
-        static VectorMap<std::string, std::vector<InputType>> instance{};
+        static VectorMap<std::string, std::vector<T>> instance{};
         return instance;
     }
 
-    template<class InputType, class... Args>
-    VectorMap<std::string, Input::Callback<InputType, Args...>>& Input::getCallbacks() const noexcept
+    template<InputType T, class... Args>
+    VectorMap<std::string, Input::Callback<T, Args...>>& Input::getCallbacks() const noexcept
     {
-        static VectorMap<std::string, Input::Callback<InputType, Args...>> instance{};
+        static VectorMap<std::string, Input::Callback<T, Args...>> instance{};
         return instance;
     }
 
-    template<class InputType, class... Args>
-    void Input::handleEvent(InputType input, Args&&... action) noexcept
+    template<InputType T, class... Args>
+    void Input::handleEvent(T input, Args&&... action) noexcept
     {
-        const auto& bindings = this->getBindins<InputType>();
+        const auto& bindings = this->getBindins<T>();
         const auto it = std::ranges::find_if(bindings,
             [&input](const auto& pair)
             {
@@ -133,7 +144,7 @@ namespace ikk
         if (it == bindings.end())
             return;
 
-        const auto& callbacks = this->getCallbacks<InputType, typename std::decay<Args>::type...>();
+        const auto& callbacks = this->getCallbacks<T, typename std::decay<Args>::type...>();
         if (const auto* callback = callbacks.find(it->first); callback != nullptr)
             (*callback)(input, std::forward<Args>(action)...);
     }
@@ -142,10 +153,10 @@ namespace ikk
     {
         switch (action)
         {
-        case GLFW_PRESS:    return Input::Action::Press;
-        case GLFW_RELEASE:  return Input::Action::Release;
-        case GLFW_REPEAT:   return Input::Action::Repeat;
-        default:            return Input::Action::Unknown;
+        case GLFW_PRESS:    return Action::Press;
+        case GLFW_RELEASE:  return Action::Release;
+        case GLFW_REPEAT:   return Action::Repeat;
+        default:            return Action::Unknown;
         }
     }
 
@@ -153,10 +164,10 @@ namespace ikk
     {
         switch (type)
         {
-        case Input::Action::Unknown:    return GLFW_KEY_UNKNOWN;
-        case Input::Action::Press:      return GLFW_PRESS;
-        case Input::Action::Release:    return GLFW_RELEASE;
-        case Input::Action::Repeat:     return GLFW_REPEAT;
+        case Action::Unknown:    return GLFW_KEY_UNKNOWN;
+        case Action::Press:      return GLFW_PRESS;
+        case Action::Release:    return GLFW_RELEASE;
+        case Action::Repeat:     return GLFW_REPEAT;
         }
         return GLFW_KEY_UNKNOWN;
     }

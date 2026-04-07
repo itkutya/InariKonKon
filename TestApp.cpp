@@ -5,7 +5,6 @@ class MenuLayer final : public ikk::Layer
 public:
     MenuLayer() noexcept
     {
-        //TODO: Error handeling...
         ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::A);
         ikk::Input.bind("Move Up", ikk::Keyboard::KeyCode::A);
         ikk::Input.bind("Move Left", ikk::Keyboard::KeyCode::D);
