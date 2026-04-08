@@ -5,11 +5,16 @@ class MenuLayer final : public ikk::Layer
 public:
     MenuLayer() noexcept
     {
-        ikk::ThreadPool threadPool{};
-        const auto t1 = threadPool.enqueue([]{ ikk::Print("Hello Threads!"); });
-        threadPool.enqueue([]{ ikk::Print("Welcome Threads!"); });
-        t1.wait();
-        threadPool.enqueue([]{ ikk::Print("Goodbye Threads!"); });
+        const ikk::EntityHandle& entity = ikk::ECS.createEntity();
+        ikk::ECS.destroyEntity(entity);
+        auto ent = entity.get();
+        if (ent.has_value())
+        {
+            if (entity.isValid())
+                ikk::Print("Entity handle is valid!");
+            auto id = (*ent)->getID();
+            ikk::Print("Entity ID: {}", id);
+        }
     }
 
     void onEvent(const ikk::Event& event) noexcept override
