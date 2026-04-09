@@ -14,5 +14,3 @@ export import :Mouse;
 
 export import :EventCallback;
 export import :EventListener;
-
-export import :Entity;

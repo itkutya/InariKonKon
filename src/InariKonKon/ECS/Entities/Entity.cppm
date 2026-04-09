@@ -2,8 +2,7 @@ module;
 
 #include "entt/entity/registry.hpp"
 
-//TODO: This should not be part of Core...
-export module Core:Entity;
+export module ECS:Entity;
 
 export namespace ikk
 {
@@ -34,7 +33,7 @@ export namespace ikk
 
         [[nodiscard]] explicit Entity(entt::registry& registry) noexcept;
 
-        friend class Scene;
+        friend class ECS;
     };
 }
 

@@ -8,11 +8,11 @@ module;
 
 export module Core:Scene;
 
-import :Entity;
 import :Window;
 import :Event;
 
 import Time;
+import ECS;
 
 export namespace ikk
 {
@@ -41,8 +41,6 @@ export namespace ikk
         Scene& operator=(Scene&&) noexcept = default;
     private:
         ID m_id = 0;
-        //TODO: Move this to ECS?
-        std::shared_ptr<entt::registry> m_registry = nullptr;
     };
 }
 
@@ -52,18 +50,17 @@ namespace ikk
     concept SceneType = std::is_base_of<Scene, T>::value;
 
     Scene::Scene() noexcept
-        : m_id([] noexcept { static ID counter = 0; return ++counter; }()), m_registry(std::make_shared<entt::registry>())
+        : m_id([] noexcept { static ID counter = 0; return ++counter; }())
     {
     }
 
     Entity Scene::createEntity() noexcept
     {
-        return Entity{ (*this->m_registry) };
+        return ECS.createEntity();
     }
 
     void Scene::destroyEntity(const Entity& entity) noexcept
     {
-        if (this->m_registry == nullptr) return;
-        this->m_registry->destroy(entity.m_entity);
+        ECS.destroyEntity(entity);
     }
 }
