@@ -1,42 +1,69 @@
 module;
 
-#include <cstdint>
+#include "entt/entity/registry.hpp"
 
-export module ECS:Entity;
+//TODO: This should not be part of Core...
+export module Core:Entity;
 
 export namespace ikk
 {
     class [[nodiscard]] Entity final
     {
     public:
-        using ID = std::uint32_t;
-
-        //TODO: Hide this somehow...
-        [[nodiscard]] Entity() noexcept;
-
+        //TODO:
         Entity(const Entity&) noexcept = default;
         Entity(Entity&&) noexcept = default;
 
+        //TODO:
         Entity& operator=(const Entity&) noexcept = default;
         Entity& operator=(Entity&&) noexcept = default;
 
+        //TODO: ?
         ~Entity() noexcept = default;
 
-        [[nodiscard]] const ID& getID() const noexcept;
+        [[nodiscard]] explicit operator bool() const noexcept;
+
+        [[nodiscard]] bool isValid() const noexcept;
+        [[nodiscard]] auto getID() const noexcept;
+
+        template<class T>
+        void addComponent(T&& component) noexcept;
     private:
-        ID m_id = 0;
+        entt::entity m_entity = entt::null;
+        entt::registry* m_registry = nullptr;
+
+        [[nodiscard]] explicit Entity(entt::registry& registry) noexcept;
+
+        friend class Scene;
     };
 }
 
 namespace ikk
 {
-    const Entity::ID& Entity::getID() const noexcept
+    Entity::Entity(entt::registry& registry) noexcept
+        : m_entity(registry.create()), m_registry(&registry)
     {
-        return this->m_id;
     }
 
-    Entity::Entity() noexcept
-        : m_id([] noexcept { static ID counter = 0; return ++counter; }())
+    Entity::operator bool() const noexcept
     {
+        return this->isValid();
+    }
+
+    bool Entity::isValid() const noexcept
+    {
+        return this->m_registry != nullptr && this->m_registry->valid(this->m_entity);
+    }
+
+    auto Entity::getID() const noexcept
+    {
+        return entt::to_integral(this->m_entity);
+    }
+
+    template<class T>
+    void Entity::addComponent(T&& component) noexcept
+    {
+        if (isValid() == false) return;
+        this->m_registry->emplace<T>(this->m_entity, std::forward<T>(component));
     }
 }

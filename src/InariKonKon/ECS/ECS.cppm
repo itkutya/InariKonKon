@@ -2,9 +2,6 @@ module;
 
 export module ECS;
 
-export import :EntityHandle;
-export import :Entity;
-
 import Singleton;
 
 export namespace ikk

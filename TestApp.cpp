@@ -1,15 +1,23 @@
 import InariKonKon;
 
+struct Velocity
+{
+    ikk::Vec3f velocity;
+};
+
 class Menu final : public ikk::Scene
 {
 public:
     Menu() noexcept
     {
-        if (const auto entity = this->createEntity(); entity)
-        {
-            const auto id = entity->getID();
-            ikk::Print("Entity ID: {}", id);
-        }
+        auto ent = this->createEntity();
+        if (ent)
+            ikk::Print("Entity ID: {}", ent.getID());
+        //this->destroyEntity(ent);
+        if (ent)
+            ikk::Print("Entity is still alive!");
+
+        ent.addComponent(Velocity{});
     }
 
     void onEvent(const ikk::Event& event) noexcept override

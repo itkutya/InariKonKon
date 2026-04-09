@@ -1,17 +1,18 @@
 module;
 
 #include <type_traits>
-#include <cstddef>
 #include <cstdint>
+#include <memory>
+
+#include "entt/entity/registry.hpp"
 
 export module Core:Scene;
 
+import :Entity;
 import :Window;
 import :Event;
 
-import StableIndexVector;
 import Time;
-import ECS;
 
 export namespace ikk
 {
@@ -27,9 +28,9 @@ export namespace ikk
         virtual void onUpdate(const Time& dt) noexcept = 0;
         virtual void onRender(const Window& window) const noexcept = 0;
 
-        [[nodiscard]] virtual EntityHandle createEntity() noexcept final;
+        [[nodiscard]] virtual Entity createEntity() noexcept final;
 
-        virtual void destroyEntity(const EntityHandle& entity) noexcept final;
+        virtual void destroyEntity(const Entity& entity) noexcept final;
     protected:
         Scene() noexcept;
 
@@ -39,8 +40,9 @@ export namespace ikk
         Scene& operator=(const Scene&) noexcept = default;
         Scene& operator=(Scene&&) noexcept = default;
     private:
-        ID m_id;
-        StableIndexVector<Entity> m_entities;
+        ID m_id = 0;
+        //TODO: Move this to ECS?
+        std::shared_ptr<entt::registry> m_registry = nullptr;
     };
 }
 
@@ -50,19 +52,18 @@ namespace ikk
     concept SceneType = std::is_base_of<Scene, T>::value;
 
     Scene::Scene() noexcept
-        : m_id([] noexcept { static ID counter = 0; return ++counter; }())
+        : m_id([] noexcept { static ID counter = 0; return ++counter; }()), m_registry(std::make_shared<entt::registry>())
     {
     }
 
-    EntityHandle Scene::createEntity() noexcept
+    Entity Scene::createEntity() noexcept
     {
-        const std::size_t id = this->m_entities.emplace();
-        return EntityHandle{ id, this->m_entities.getValidityID(id), &this->m_entities };
+        return Entity{ (*this->m_registry) };
     }
 
-    void Scene::destroyEntity(const EntityHandle& entity) noexcept
+    void Scene::destroyEntity(const Entity& entity) noexcept
     {
-        if (const auto& ent = entity.get(); ent.has_value())
-            this->m_entities.erase(entity.getIndex());
+        if (this->m_registry == nullptr) return;
+        this->m_registry->destroy(entity.m_entity);
     }
 }
