@@ -13,7 +13,7 @@ export module Core:Application;
 import :EventManager;
 import :Renderer;
 import :Window;
-import :Layer;
+import :Scene;
 
 import Time;
 import Clock;
@@ -36,16 +36,16 @@ export namespace ikk
 
         void run() noexcept;
 
-        template<LayerType T>
-        void attach(T&& layer) noexcept;
+        template<SceneType T>
+        void add(T&& scene) noexcept;
 
         //TODO:
-        //void detach() noexcept;
+        //void remove(ID) noexcept;
     private:
         Window m_window;
         Clock m_deltaTime;
 
-        std::vector<std::shared_ptr<Layer>> m_layers;
+        std::vector<std::shared_ptr<Scene>> m_scenes;
 
         void processEvents() const noexcept;
         void update() noexcept;
@@ -71,10 +71,10 @@ namespace ikk
         }
     }
 
-    template<LayerType T>
-    void Application::attach(T&& layer) noexcept
+    template<SceneType T>
+    void Application::add(T&& scene) noexcept
     {
-        this->m_layers.emplace_back(std::make_shared<T>(std::forward<T>(layer)));
+        this->m_scenes.emplace_back(std::make_shared<T>(std::forward<T>(scene)));
     }
 
     void Application::processEvents() const noexcept
@@ -84,7 +84,7 @@ namespace ikk
         while (eventManager.isEmpty() == false)
         {
             const Event& event = eventManager.top();
-            for (const std::shared_ptr<Layer>& layer : this->m_layers)
+            for (const std::shared_ptr<Scene>& layer : this->m_scenes)
                 layer->onEvent(event);
             eventManager.pop();
         }
@@ -93,13 +93,13 @@ namespace ikk
     void Application::update() noexcept
     {
         const Time dt = this->m_deltaTime.restart();
-        for (const std::shared_ptr<Layer>& layer : this->m_layers)
+        for (const std::shared_ptr<Scene>& layer : this->m_scenes)
             layer->onUpdate(dt);
     }
 
     void Application::render() const noexcept
     {
-        for (const std::shared_ptr<Layer>& layer : this->m_layers)
+        for (const std::shared_ptr<Scene>& layer : this->m_scenes)
             layer->onRender(this->m_window);
         this->m_window.render();
     }

@@ -24,16 +24,17 @@ export namespace ikk
 
         ~EntityHandle() noexcept = default;
 
+        [[nodiscard]] explicit operator bool() const noexcept;
+        [[nodiscard]] Entity* operator->() const noexcept;
+
         [[nodiscard]] std::optional<Entity*> get() const noexcept;
+        [[nodiscard]] const std::size_t& getIndex() const noexcept;
 
         [[nodiscard]] bool isValid() const noexcept;
     private:
         std::size_t m_index;
         std::size_t m_validityID;
         StableIndexVector<Entity>* m_data;
-
-        friend class ECS;
-        friend class StableIndexVector<Entity>;
     };
 }
 
@@ -44,10 +45,26 @@ namespace ikk
     {
     }
 
+    EntityHandle::operator bool() const noexcept
+    {
+        return (this->m_data != nullptr && this->isValid() != false);
+    }
+
+    Entity* EntityHandle::operator->() const noexcept
+    {
+        if (this->m_data == nullptr || this->isValid() == false) return nullptr;
+        return &this->m_data->at(this->m_index);
+    }
+
     std::optional<Entity*> EntityHandle::get() const noexcept
     {
         if (this->m_data == nullptr || this->isValid() == false) return std::nullopt;
         return &this->m_data->at(this->m_index);
+    }
+
+    const std::size_t& EntityHandle::getIndex() const noexcept
+    {
+        return this->m_index;
     }
 
     bool EntityHandle::isValid() const noexcept

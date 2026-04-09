@@ -22,6 +22,8 @@ export namespace ikk
         ~StableIndexVector() noexcept = default;
 
         [[nodiscard]] std::size_t insert(const T& value) noexcept;
+        template<class... Args>
+        [[nodiscard]] std::size_t emplace(Args&&... args) noexcept;
 
         void erase(std::size_t index) noexcept;
 
@@ -59,6 +61,15 @@ namespace ikk
     {
         const std::size_t id = this->getFreeSlot();
         this->m_data.emplace_back(value);
+        return id;
+    }
+
+    template<class T>
+    template<class... Args>
+    std::size_t StableIndexVector<T>::emplace(Args&&... args) noexcept
+    {
+        const std::size_t id = this->getFreeSlot();
+        this->m_data.emplace_back(std::forward<Args>(args)...);
         return id;
     }
 

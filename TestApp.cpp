@@ -1,18 +1,13 @@
 import InariKonKon;
 
-class MenuLayer final : public ikk::Layer
+class Menu final : public ikk::Scene
 {
 public:
-    MenuLayer() noexcept
+    Menu() noexcept
     {
-        const ikk::EntityHandle& entity = ikk::ECS.createEntity();
-        ikk::ECS.destroyEntity(entity);
-        auto ent = entity.get();
-        if (ent.has_value())
+        if (const auto entity = this->createEntity(); entity)
         {
-            if (entity.isValid())
-                ikk::Print("Entity handle is valid!");
-            auto id = (*ent)->getID();
+            const auto id = entity->getID();
             ikk::Print("Entity ID: {}", id);
         }
     }
@@ -34,7 +29,7 @@ private:
 int main()
 {
     ikk::Application app{ u8"TestApp 生", 800, 600 };
-    app.attach(MenuLayer{});
+    app.add(Menu{});
     app.run();
     return 0;
 }

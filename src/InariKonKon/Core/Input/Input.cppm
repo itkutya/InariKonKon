@@ -96,7 +96,7 @@ namespace ikk
         auto& bindings = this->getBindins<T>();
         std::vector<T>* found = bindings.find(name);
         if (found == nullptr)
-            bindings.insert(name, std::vector<T>{input});
+            bindings.emplace(name, std::vector<T>{input});
         else
         {
             for (const auto& i : (*found)) if (i == input) return;
@@ -112,7 +112,7 @@ namespace ikk
         {
             static_assert(std::is_invocable<FuncType, Args...>::value == true, "Input.onAction must be invokable");
             if (auto& callbacks = this->getCallbacks<Args...>(); callbacks.find(n) == nullptr)
-                callbacks.insert(n, std::forward<F>(f));
+                callbacks.emplace(n, std::forward<F>(f));
         }(name, std::forward<FuncType>(func), typename Traits::ArgsTuple{});
     }
 

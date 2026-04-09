@@ -23,6 +23,9 @@ export namespace ikk
         ~VectorMap() = default;
 
         void insert(const Key& key, const T& value) noexcept;
+        template<class... KeyArgs, class... ValueArgs>
+        void emplace(KeyArgs&&... keyArgs, ValueArgs&&... valueArgs) noexcept;
+
         void remove(const Key& key) noexcept;
 
         bool contains(const Key& key) const noexcept;
@@ -46,7 +49,16 @@ namespace ikk
     void VectorMap<Key, T>::insert(const Key& key, const T& value) noexcept
     {
         if (this->contains(key) == true) return;
-        this->m_storage.emplace_back(std::make_pair(key, value));
+        this->m_storage.emplace_back(key, value);
+    }
+
+    template<class Key, class T>
+    template<class... KeyArgs, class... ValueArgs>
+    void VectorMap<Key, T>::emplace(KeyArgs&&... keyArgs, ValueArgs&&... valueArgs) noexcept
+    {
+        Key&& key = Key{ std::forward<KeyArgs>(keyArgs)... };
+        if (this->contains(key) == true) return;
+        this->m_storage.emplace_back(key, std::forward<ValueArgs>(valueArgs)...);
     }
 
     template<class Key, class T>

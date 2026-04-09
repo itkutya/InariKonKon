@@ -11,6 +11,9 @@ export namespace ikk
     public:
         using ID = std::uint32_t;
 
+        //TODO: Hide this somehow...
+        [[nodiscard]] Entity() noexcept;
+
         Entity(const Entity&) noexcept = default;
         Entity(Entity&&) noexcept = default;
 
@@ -20,14 +23,8 @@ export namespace ikk
         ~Entity() noexcept = default;
 
         [[nodiscard]] const ID& getID() const noexcept;
-    protected:
-        [[nodiscard]] explicit Entity() noexcept;
     private:
         ID m_id = 0;
-
-        inline static ID s_counter = 0;
-
-        friend class ECS;
     };
 }
 
@@ -39,7 +36,7 @@ namespace ikk
     }
 
     Entity::Entity() noexcept
-        : m_id(++s_counter)
+        : m_id([] noexcept { static ID counter = 0; return ++counter; }())
     {
     }
 }
