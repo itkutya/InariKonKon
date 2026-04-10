@@ -1,5 +1,7 @@
 module;
 
+#include <utility>
+
 #include "entt/entity/registry.hpp"
 
 export module ECS:Entity;
@@ -9,15 +11,12 @@ export namespace ikk
     class [[nodiscard]] Entity final
     {
     public:
-        //TODO:
         Entity(const Entity&) noexcept = default;
         Entity(Entity&&) noexcept = default;
 
-        //TODO:
         Entity& operator=(const Entity&) noexcept = default;
         Entity& operator=(Entity&&) noexcept = default;
 
-        //TODO: ?
         ~Entity() noexcept = default;
 
         [[nodiscard]] explicit operator bool() const noexcept;
@@ -25,8 +24,8 @@ export namespace ikk
         [[nodiscard]] bool isValid() const noexcept;
         [[nodiscard]] auto getID() const noexcept;
 
-        template<class T>
-        void addComponent(T&& component) noexcept;
+        template<class T, class... Args>
+        void addComponent(Args&&... args) noexcept;
     private:
         entt::entity m_entity = entt::null;
         entt::registry* m_registry = nullptr;
@@ -56,13 +55,14 @@ namespace ikk
 
     auto Entity::getID() const noexcept
     {
-        return entt::to_integral(this->m_entity);
+        if (this->isValid() == true) return entt::to_integral(this->m_entity);
+        return 0u;
     }
 
-    template<class T>
-    void Entity::addComponent(T&& component) noexcept
+    template<class T, class... Args>
+    void Entity::addComponent(Args&&... args) noexcept
     {
         if (isValid() == false) return;
-        this->m_registry->emplace<T>(this->m_entity, std::forward<T>(component));
+        this->m_registry->emplace<T>(this->m_entity, std::forward<Args>(args)...);
     }
 }

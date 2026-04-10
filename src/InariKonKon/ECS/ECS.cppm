@@ -5,6 +5,7 @@ module;
 export module ECS;
 
 export import :Entity;
+export import :System;
 
 import Singleton;
 
@@ -16,9 +17,11 @@ export namespace ikk
 
         ECS() noexcept = default;
     public:
-        [[nodiscard]] virtual Entity createEntity() noexcept final;
+        ~ECS() noexcept = default;
 
-        virtual void destroyEntity(const Entity& entity) noexcept final;
+        [[nodiscard]] Entity createEntity() noexcept;
+
+        void destroyEntity(const Entity& entity) noexcept;
     private:
         entt::registry m_registry{};
     };

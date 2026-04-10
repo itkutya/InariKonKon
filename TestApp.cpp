@@ -10,14 +10,15 @@ class Menu final : public ikk::Scene
 public:
     Menu() noexcept
     {
-        auto ent = this->createEntity();
+        auto& ent = this->createEntity();
+        bool valid = ent.isValid();
         if (ent)
             ikk::Print("Entity ID: {}", ent.getID());
         //this->destroyEntity(ent);
         if (ent)
             ikk::Print("Entity is still alive!");
 
-        ent.addComponent(Velocity{});
+        ent.addComponent<Velocity>();
     }
 
     void onEvent(const ikk::Event& event) noexcept override

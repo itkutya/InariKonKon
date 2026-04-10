@@ -2,9 +2,7 @@ module;
 
 #include <type_traits>
 #include <cstdint>
-#include <memory>
-
-#include "entt/entity/registry.hpp"
+#include <vector>
 
 export module Core:Scene;
 
@@ -16,7 +14,6 @@ import ECS;
 
 export namespace ikk
 {
-    //TODO: Make every class that has to be inherited from name the same like IScene, or something like that...
     class Scene
     {
     public:
@@ -28,7 +25,7 @@ export namespace ikk
         virtual void onUpdate(const Time& dt) noexcept = 0;
         virtual void onRender(const Window& window) const noexcept = 0;
 
-        [[nodiscard]] virtual Entity createEntity() noexcept final;
+        [[nodiscard]] virtual Entity& createEntity() noexcept final;
 
         virtual void destroyEntity(const Entity& entity) noexcept final;
     protected:
@@ -41,6 +38,7 @@ export namespace ikk
         Scene& operator=(Scene&&) noexcept = default;
     private:
         ID m_id = 0;
+        std::vector<Entity> m_entities{};
     };
 }
 
@@ -54,9 +52,9 @@ namespace ikk
     {
     }
 
-    Entity Scene::createEntity() noexcept
+    Entity& Scene::createEntity() noexcept
     {
-        return ECS.createEntity();
+        return this->m_entities.emplace_back(ECS.createEntity());
     }
 
     void Scene::destroyEntity(const Entity& entity) noexcept
