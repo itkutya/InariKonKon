@@ -26,13 +26,19 @@ export namespace ikk
 
         template<class T, class... Args>
         void addComponent(Args&&... args) noexcept;
+
+        [[nodiscard]] bool operator==(const Entity& other) const noexcept;
     private:
         entt::entity m_entity = entt::null;
         entt::registry* m_registry = nullptr;
 
         [[nodiscard]] explicit Entity(entt::registry& registry) noexcept;
+        [[nodiscard]] explicit Entity(entt::entity entity, entt::registry& registry) noexcept;
 
-        friend class ECS;
+        friend class EntityComponentSystem;
+
+        template<class... Components>
+        friend class System;
     };
 }
 
@@ -40,6 +46,11 @@ namespace ikk
 {
     Entity::Entity(entt::registry& registry) noexcept
         : m_entity(registry.create()), m_registry(&registry)
+    {
+    }
+
+    Entity::Entity(entt::entity entity, entt::registry& registry) noexcept
+        : m_entity(entity), m_registry(&registry)
     {
     }
 
@@ -55,8 +66,13 @@ namespace ikk
 
     auto Entity::getID() const noexcept
     {
-        if (this->isValid() == true) return entt::to_integral(this->m_entity);
-        return 0u;
+        if (this->isValid() == false) return 0u;
+        return entt::to_integral(this->m_entity);
+    }
+
+    bool Entity::operator==(const Entity& other) const noexcept
+    {
+        return this->m_entity == other.m_entity;
     }
 
     template<class T, class... Args>

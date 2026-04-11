@@ -201,7 +201,10 @@ export namespace ikk
     using Vec4I = Vec4<std::int64_t>;
     using Vec4u = Vec4<std::uint32_t>;
     using Vec4U = Vec4<std::uint64_t>;
+}
 
+namespace ikk
+{
     template<std::size_t N, Number T>
     constexpr Vec<N, T>::Vec(T value) noexcept
     {
