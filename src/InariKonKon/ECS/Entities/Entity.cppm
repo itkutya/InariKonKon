@@ -32,7 +32,6 @@ export namespace ikk
         entt::entity m_entity = entt::null;
         entt::registry* m_registry = nullptr;
 
-        [[nodiscard]] explicit Entity(entt::registry& registry) noexcept;
         [[nodiscard]] explicit Entity(entt::entity entity, entt::registry& registry) noexcept;
 
         friend class EntityComponentSystem;
@@ -44,11 +43,6 @@ export namespace ikk
 
 namespace ikk
 {
-    Entity::Entity(entt::registry& registry) noexcept
-        : m_entity(registry.create()), m_registry(&registry)
-    {
-    }
-
     Entity::Entity(entt::entity entity, entt::registry& registry) noexcept
         : m_entity(entity), m_registry(&registry)
     {

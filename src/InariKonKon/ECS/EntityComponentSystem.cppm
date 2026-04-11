@@ -37,7 +37,7 @@ namespace ikk
 {
     Entity EntityComponentSystem::createEntity() noexcept
     {
-        return Entity{ this->m_registry };
+        return Entity{ this->m_registry.create(), this->m_registry };
     }
 
     void EntityComponentSystem::destroyEntity(const Entity& entity) noexcept
