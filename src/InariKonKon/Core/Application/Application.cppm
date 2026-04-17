@@ -36,11 +36,9 @@ export namespace ikk
 
         void run() noexcept;
 
-        template<SceneType T>
-        void add(T&& scene) noexcept;
-
-        //TODO:
-        //void remove(ID) noexcept;
+        template<SceneType T, class... Args>
+        void addScene(Args... args) noexcept;
+        void removeScene(Scene::ID id) noexcept;
     private:
         Window m_window;
         Clock m_deltaTime;
@@ -71,10 +69,16 @@ namespace ikk
         }
     }
 
-    template<SceneType T>
-    void Application::add(T&& scene) noexcept
+    template<SceneType T, class... Args>
+    void Application::addScene(Args... args) noexcept
     {
-        this->m_scenes.emplace_back(std::make_shared<T>(std::forward<T>(scene)));
+        this->m_scenes.emplace_back(std::make_shared<T>(this, std::forward<Args>(args)...));
+    }
+
+    void Application::removeScene(Scene::ID id) noexcept
+    {
+        std::erase_if(this->m_scenes,
+            [id](const std::shared_ptr<Scene>& scene) noexcept{ return scene->getID() == id; });
     }
 
     void Application::processEvents() const noexcept

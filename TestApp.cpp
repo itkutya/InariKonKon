@@ -13,7 +13,8 @@ struct Position
 class Menu final : public ikk::Scene
 {
 public:
-    Menu() noexcept
+    explicit Menu(ikk::Application* application) noexcept
+        : ikk::Scene(application)
     {
         ent1.addComponent<Position>(ikk::Vec3f{ 2.f, 5.f, 1.f });
         ent1.addComponent<Velocity>(ikk::Vec3f{ 0.f, 2.f, 5.f });
@@ -52,7 +53,7 @@ private:
 int main()
 {
     ikk::Application app{ u8"TestApp 生", 800, 600 };
-    app.add(Menu{});
+    app.addScene<Menu>();
     app.run();
     return 0;
 }
