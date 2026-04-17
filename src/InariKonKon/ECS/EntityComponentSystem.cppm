@@ -6,8 +6,6 @@ export module ECS:EntityComponentSystem;
 
 import Singleton;
 
-import :Entity;
-
 export namespace ikk
 {
     class EntityComponentSystem final : public Singleton<EntityComponentSystem>
@@ -18,16 +16,10 @@ export namespace ikk
     public:
         ~EntityComponentSystem() noexcept = default;
 
-        [[nodiscard]] Entity createEntity() noexcept;
-
-        void destroyEntity(const Entity& entity) noexcept;
-
-        void clear() noexcept;
+        [[nodiscard]] const auto& getRegistry() const noexcept;
+        [[nodiscard]] auto& getRegistry() noexcept;
     private:
         entt::registry m_registry{};
-
-        template<class... Args>
-        friend class System;
     };
 
     EntityComponentSystem& ECS = EntityComponentSystem::getInstance();
@@ -35,18 +27,13 @@ export namespace ikk
 
 namespace ikk
 {
-    Entity EntityComponentSystem::createEntity() noexcept
+    const auto& EntityComponentSystem::getRegistry() const noexcept
     {
-        return Entity{ this->m_registry.create(), this->m_registry };
+        return this->m_registry;
     }
 
-    void EntityComponentSystem::destroyEntity(const Entity& entity) noexcept
+    auto& EntityComponentSystem::getRegistry() noexcept
     {
-        this->m_registry.destroy(entity.m_entity);
-    }
-
-    void EntityComponentSystem::clear() noexcept
-    {
-        this->m_registry.clear();
+        return this->m_registry;
     }
 }

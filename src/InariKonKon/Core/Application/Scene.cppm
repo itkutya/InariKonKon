@@ -2,7 +2,6 @@ module;
 
 #include <type_traits>
 #include <cstdint>
-#include <vector>
 
 export module Core:Scene;
 
@@ -10,7 +9,6 @@ import :Window;
 import :Event;
 
 import Time;
-import ECS;
 
 export namespace ikk
 {
@@ -19,15 +17,11 @@ export namespace ikk
     public:
         using ID = std::uint32_t;
 
-        virtual ~Scene() noexcept;
+        virtual ~Scene() noexcept = default;
 
         virtual void onEvent(const Event& event) noexcept = 0;
         virtual void onUpdate(const Time& dt) noexcept = 0;
         virtual void onRender(const Window& window) const noexcept = 0;
-
-        [[nodiscard]] virtual Entity& createEntity() noexcept final;
-
-        virtual void destroyEntity(const Entity& entity) noexcept final;
     protected:
         Scene() noexcept;
 
@@ -38,7 +32,6 @@ export namespace ikk
         Scene& operator=(Scene&&) noexcept = default;
     private:
         ID m_id = 0;
-        std::vector<Entity> m_entities{};
     };
 }
 
@@ -50,22 +43,5 @@ namespace ikk
     Scene::Scene() noexcept
         : m_id([] noexcept { static ID counter = 0; return ++counter; }())
     {
-    }
-
-    Scene::~Scene() noexcept
-    {
-        while (this->m_entities.empty() == false)
-            this->destroyEntity(this->m_entities.back());
-    }
-
-    Entity& Scene::createEntity() noexcept
-    {
-        return this->m_entities.emplace_back(ECS.createEntity());
-    }
-
-    void Scene::destroyEntity(const Entity& entity) noexcept
-    {
-        ECS.destroyEntity(entity);
-        std::erase(this->m_entities, entity);
     }
 }

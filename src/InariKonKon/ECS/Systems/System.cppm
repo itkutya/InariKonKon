@@ -11,7 +11,6 @@ import :Entity;
 
 export namespace ikk
 {
-    //TODO: Concepts...
     template<class... Components>
     class System final
     {
@@ -27,7 +26,7 @@ export namespace ikk
         ~System() noexcept = default;
 
         template<class Func, class... Args>
-        void update(Func&& func, Args&&... args) const noexcept;
+        static void update(Func&& func, Args&&... args) noexcept;
     private:
     };
 }
@@ -36,12 +35,14 @@ namespace ikk
 {
     template<class... Components>
     template<class Func, class... Args>
-    void System<Components...>::update(Func&& func, Args&&... args) const noexcept
+    void System<Components...>::update(Func&& func, Args&&... args) noexcept
     {
-        auto view = ECS.m_registry.view<Components...>();
-        view.each([&func, &args...](const auto& entity, auto&... components)
+        auto view = ECS.getRegistry().view<Components...>();
+        view.each([&func, &args...](const auto& entity, auto&... components) noexcept
         {
-            std::forward<Func>(func)(Entity{entity, ECS.m_registry}, components..., std::forward<Args>(args)...);
+            Entity ent{ entity };
+            std::forward<Func>(func)(ent, components..., std::forward<Args>(args)...);
+            ent.m_entity = entt::null;
         });
     }
 }
