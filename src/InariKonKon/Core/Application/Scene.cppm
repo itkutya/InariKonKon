@@ -39,7 +39,6 @@ export namespace ikk
         virtual Application& getApplication() noexcept final;
     private:
         ID m_id = 0;
-
         Application* m_application = nullptr;
     };
 }

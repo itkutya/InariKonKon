@@ -7,9 +7,9 @@ export module NumericCasts;
 
 namespace ikk
 {
-    #define DEFINE_CAST_FUNC(NAME, TYPE)                                                            \
-    template<class T> requires (std::is_convertible<T, TYPE>::value == true)                        \
-    [[nodiscard]] inline constexpr TYPE NAME(T value) noexcept { return static_cast<TYPE>(value); }
+    #define DEFINE_CAST_FUNC(NAME, TYPE)                                                                 \
+    template<class T>                                                                                    \
+    [[nodiscard]] inline constexpr TYPE NAME(const T& value) noexcept { return static_cast<TYPE>(value); }
 }
 
 export namespace ikk

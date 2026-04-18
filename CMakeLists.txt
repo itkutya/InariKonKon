@@ -25,9 +25,12 @@ FetchContent_MakeAvailable(fmt)
 FetchContent_Declare(entt GIT_REPOSITORY https://github.com/skypjack/entt.git GIT_TAG main)
 FetchContent_MakeAvailable(entt)
 
+FetchContent_Declare(miniaudio GIT_REPOSITORY https://github.com/mackron/miniaudio.git GIT_TAG master)
+FetchContent_MakeAvailable(miniaudio)
+
 find_package(Vulkan REQUIRED shaderc_combined)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt EnTT::EnTT Vulkan::Vulkan Vulkan::shaderc_combined)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt EnTT::EnTT Vulkan::Vulkan Vulkan::shaderc_combined miniaudio)
 
 add_executable(TestApp TestApp.cpp)
 target_link_libraries(TestApp InariKonKonGameFramework)
