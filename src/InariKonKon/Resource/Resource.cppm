@@ -4,7 +4,7 @@ module;
 #include <future>
 #include <thread>
 #include <chrono>
-#include <mutex>
+#include <atomic>
 
 export module Resource;
 
@@ -42,11 +42,10 @@ export namespace ikk
 
         [[nodiscard]] bool isReady() const noexcept;
 
-        ResourceLoader::State waitFor(const Time& time) const noexcept;
+        void waitFor(const Time& time) const noexcept;
     private:
-        mutable std::mutex m_mutex;
         T m_data{};
-        ResourceLoader::State m_state = ResourceLoader::State::Empty;
+        std::atomic<ResourceLoader::State> m_state = ResourceLoader::State::Empty;
     };
 }
 
@@ -61,35 +60,30 @@ namespace ikk
     template<class T>
     Resource<T>::operator const T&() const noexcept
     {
-        std::lock_guard lock(this->m_mutex);
         return this->m_data;
     }
 
     template<class T>
     Resource<T>::operator T&() noexcept
     {
-        std::lock_guard lock(this->m_mutex);
         return this->m_data;
     }
 
     template<class T>
     const T& Resource<T>::operator->() const noexcept
     {
-        std::lock_guard lock(this->m_mutex);
         return this->m_data;
     }
 
     template<class T>
     T& Resource<T>::operator->() noexcept
     {
-        std::lock_guard lock(this->m_mutex);
         return this->m_data;
     }
 
     template<class T>
     void Resource<T>::load(const std::filesystem::path& path) noexcept
     {
-        std::lock_guard lock(this->m_mutex);
         this->m_state = ResourceLoader::State::Loading;
         this->m_data = ResourceLoader::load<T>(path);
         this->m_state = ResourceLoader::State::Ready;
@@ -98,17 +92,11 @@ namespace ikk
     template<class T>
     void Resource<T>::loadAsync(const std::filesystem::path& path) noexcept
     {
-        {
-            std::lock_guard lock(this->m_mutex);
-            this->m_state = ResourceLoader::State::Loading;
-        }
-
+        this->m_state = ResourceLoader::State::Loading;
         resourceManager.getThreadPool().enqueue(
             [path, this] noexcept
             {
                 T result = ResourceLoader::load<T>(path);
-
-                std::lock_guard lock(this->m_mutex);
                 this->m_data = std::move(result);
                 this->m_state = ResourceLoader::State::Ready;
             });
@@ -117,20 +105,17 @@ namespace ikk
     template<class T>
     bool Resource<T>::isReady() const noexcept
     {
-        std::lock_guard lock(this->m_mutex);
         return this->m_state == ResourceLoader::State::Ready;
     }
 
     template<class T>
-    ResourceLoader::State Resource<T>::waitFor(const Time& time) const noexcept
+    void Resource<T>::waitFor(const Time& time) const noexcept
     {
         Clock clock{};
         while (clock.getElapsedTime() <= time)
         {
-            if (this->isReady() == true) break;
+            if (this->isReady() == true) return;
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        std::lock_guard lock(this->m_mutex);
-        return this->m_state;
     }
 }
