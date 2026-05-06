@@ -1,20 +1,31 @@
 import InariKonKon;
 
+//TODO: VERY IMPORTANT!!!
+// - MAKE REAL ERROR HANDLEING, THROWING EXCEPTIONS OR std::expected/std::optional
+
 class Menu final : public ikk::Scene
 {
 public:
     explicit Menu(ikk::Application* application) noexcept
         : ikk::Scene(application)
     {
-        ikk::test();
-        tex.loadAsync("");
+        ikk::Clock timer{};
 
-        tex.waitFor(ikk::seconds(0.f));
+        audio.loadFromFileAsync("/home/itkutya/Documents/c++/CLion/InariKonKonGameFramework/Resources/audio.mp3");
 
-        while (tex.isReady() == false)
+        tex.loadFromFileAsync("/home/itkutya/Documents/c++/CLion/InariKonKonGameFramework/Resources/osu_logo.png");
+
+        tex.waitFor(ikk::seconds(0.1f));
+
+        audio.play();
+
+        while (tex.isLoading() == true)
             ikk::Print("No data");
 
-        ikk::Print("{}", ikk::I32(tex));
+        ikk::Resource::preloadFromFile<ikk::Texture>("Name", "Path");
+        //auto temp = ikk::Resource<ikk::Texture>::get("Name");
+
+        ikk::Print("Time it took: {}s", timer.getElapsedTime().asSeconds());
     }
 
     void onEvent(const ikk::Event& event) noexcept override
@@ -29,7 +40,8 @@ public:
     {
     }
 private:
-    ikk::Resource<int> tex{};
+    ikk::Texture tex{};
+    ikk::Audio audio{};
 };
 
 int main()

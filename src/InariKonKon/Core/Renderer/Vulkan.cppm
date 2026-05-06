@@ -176,8 +176,9 @@ namespace ikk
 
         this->m_imageIndex = nextImage.value;
 
+        this->m_commandBuffers[this->m_currentFrame].reset();
         vk::CommandBufferBeginInfo beginInfo{};
-        this->m_commandBuffers[this->m_imageIndex].begin(beginInfo);
+        this->m_commandBuffers[this->m_currentFrame].begin(beginInfo);
 
         const vk::ClearValue color{std::array<float, 4>{
             F32(clearColor.r) / F32(std::numeric_limits<std::uint8_t>::max()),
@@ -193,27 +194,27 @@ namespace ikk
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &color;
 
-        this->m_commandBuffers[this->m_imageIndex].beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-        this->m_commandBuffers[this->m_imageIndex].bindPipeline(vk::PipelineBindPoint::eGraphics, this->m_graphicsPipeline);
+        this->m_commandBuffers[this->m_currentFrame].beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+        this->m_commandBuffers[this->m_currentFrame].bindPipeline(vk::PipelineBindPoint::eGraphics, this->m_graphicsPipeline);
 
-        // const vk::Viewport viewport{0.0f, 0.0f,
-        //                       F32(this->m_swapChainExtent.width),
-        //                       F32(this->m_swapChainExtent.height),
-        //                       0.0f, 1.0f};
-        // this->m_commandBuffers[imageIndex].setViewport(0, viewport);
-        //
-        // const vk::Rect2D scissor{{0,0}, this->m_swapChainExtent};
-        // this->m_commandBuffers[imageIndex].setScissor(0, scissor);
+        const vk::Viewport viewport{0.0f, 0.0f,
+                              F32(this->m_swapChainExtent.width),
+                              F32(this->m_swapChainExtent.height),
+                              0.0f, 1.0f};
+        this->m_commandBuffers[this->m_currentFrame].setViewport(0, viewport);
+
+        const vk::Rect2D scissor{{0,0}, this->m_swapChainExtent};
+        this->m_commandBuffers[this->m_currentFrame].setScissor(0, scissor);
     }
 
     //TODO:
     void Vulkan::endRender() noexcept
     {
-        this->m_commandBuffers[this->m_imageIndex].endRenderPass();
-        this->m_commandBuffers[this->m_imageIndex].end();
+        this->m_commandBuffers[this->m_currentFrame].endRenderPass();
+        this->m_commandBuffers[this->m_currentFrame].end();
 
-        vk::Semaphore waitSemaphores[] = { this->m_imageAvailableSemaphores[this->m_imageIndex] };
-        vk::Semaphore signalSemaphores[] = { this->m_renderFinishedSemaphores[this->m_imageIndex] };
+        vk::Semaphore waitSemaphores[] = { this->m_imageAvailableSemaphores[this->m_currentFrame] };
+        vk::Semaphore signalSemaphores[] = { this->m_renderFinishedSemaphores[this->m_currentFrame] };
         vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
 
         vk::SubmitInfo submitInfo{};
@@ -221,7 +222,7 @@ namespace ikk
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &this->m_commandBuffers[this->m_imageIndex];
+        submitInfo.pCommandBuffers = &this->m_commandBuffers[this->m_currentFrame];
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 

@@ -28,9 +28,21 @@ FetchContent_MakeAvailable(entt)
 FetchContent_Declare(miniaudio GIT_REPOSITORY https://github.com/mackron/miniaudio.git GIT_TAG master)
 FetchContent_MakeAvailable(miniaudio)
 
+set(STEAMAUDIO_ROOT ${CMAKE_SOURCE_DIR}/external/steamaudio)
+include_directories(${STEAMAUDIO_ROOT}/include)
+#TODO:
+if (WIN32)
+    set(STEAMAUDIO_LIB ${STEAMAUDIO_ROOT}/lib/windows-x64/phonon.lib)
+elseif (UNIX)
+    set(STEAMAUDIO_LIB ${STEAMAUDIO_ROOT}/lib/linux-x64/libphonon.so)
+endif ()
+
+FetchContent_Declare(stb GIT_REPOSITORY https://github.com/nothings/stb.git GIT_TAG master)
+FetchContent_MakeAvailable(stb)
+
 find_package(Vulkan REQUIRED shaderc_combined)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt EnTT::EnTT Vulkan::Vulkan Vulkan::shaderc_combined miniaudio)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt EnTT::EnTT Vulkan::Vulkan Vulkan::shaderc_combined miniaudio ${STEAMAUDIO_LIB} stb)
 
 add_executable(TestApp TestApp.cpp)
 target_link_libraries(TestApp InariKonKonGameFramework)

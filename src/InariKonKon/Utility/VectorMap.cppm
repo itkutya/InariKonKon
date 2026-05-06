@@ -23,8 +23,8 @@ export namespace ikk
         ~VectorMap() = default;
 
         void insert(const Key& key, const T& value) noexcept;
-        template<class... KeyArgs, class... ValueArgs>
-        void emplace(KeyArgs&&... keyArgs, ValueArgs&&... valueArgs) noexcept;
+        template<class... ValueArgs>
+        std::pair<Key, T>& emplace(const Key& key, ValueArgs&&... valueArgs) noexcept;
 
         void remove(const Key& key) noexcept;
 
@@ -32,6 +32,9 @@ export namespace ikk
 
         const T* find(const Key& key) const noexcept;
         T* find(const Key& key) noexcept;
+
+        const T& at(const Key& key) const noexcept;
+        T& at(const Key& key) noexcept;
 
         auto begin() const noexcept;
         auto begin() noexcept;
@@ -53,12 +56,12 @@ namespace ikk
     }
 
     template<class Key, class T>
-    template<class... KeyArgs, class... ValueArgs>
-    void VectorMap<Key, T>::emplace(KeyArgs&&... keyArgs, ValueArgs&&... valueArgs) noexcept
+    template<class... ValueArgs>
+    std::pair<Key, T>& VectorMap<Key, T>::emplace(const Key& key, ValueArgs&&... valueArgs) noexcept
     {
-        Key&& key = Key{ std::forward<KeyArgs>(keyArgs)... };
-        if (this->contains(key) == true) return;
-        this->m_storage.emplace_back(key, std::forward<ValueArgs>(valueArgs)...);
+        auto it = std::ranges::find_if(this->m_storage, [&key](const auto& pair) { return pair.first == key; });
+        if (it != this->m_storage.end()) return *it;
+        return this->m_storage.emplace_back(key, std::forward<ValueArgs>(valueArgs)...);
     }
 
     template<class Key, class T>
@@ -87,6 +90,18 @@ namespace ikk
         auto it = std::ranges::find_if(this->m_storage, [&key](const auto& pair) { return pair.first == key; });
         if (it == this->m_storage.end()) return nullptr;
         else return &it->second;
+    }
+
+    template<class Key, class T>
+    const T& VectorMap<Key, T>::at(const Key& key) const noexcept
+    {
+        return std::ranges::find_if(this->m_storage, [&key](const auto& pair) { return pair.first == key; })->second;
+    }
+
+    template<class Key, class T>
+    T& VectorMap<Key, T>::at(const Key& key) noexcept
+    {
+        return std::ranges::find_if(this->m_storage, [&key](const auto& pair) { return pair.first == key; })->second;
     }
 
     template<class Key, class T>

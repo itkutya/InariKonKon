@@ -13,8 +13,8 @@ export namespace ikk
     public:
         ~ResourceManager() noexcept = default;
 
-        const ThreadPool& getThreadPool() const noexcept;
-        ThreadPool& getThreadPool() noexcept;
+        [[nodiscard]] const ThreadPool& getThreadPool() const noexcept;
+        [[nodiscard]] ThreadPool& getThreadPool() noexcept;
     private:
         ThreadPool m_threadPool{};
     };
