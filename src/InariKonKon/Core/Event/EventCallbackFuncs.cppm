@@ -16,7 +16,7 @@ import :Event;
 import :Input;
 
 import NonConstructible;
-import Log;
+import Print;
 import Vec;
 
 export namespace ikk

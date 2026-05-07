@@ -14,6 +14,7 @@ import :EventCallbackFuncs;
 import :Renderer;
 import :Vulkan;
 
+import Container;
 import Color;
 
 export namespace ikk
@@ -21,6 +22,11 @@ export namespace ikk
     class [[nodiscard]] Window final
     {
     public:
+        struct [[nodiscard]] Settings
+        {
+            Color clearColor = Color::Miku;
+        };
+
         [[nodiscard]] Window(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept;
 
         Window(const Window& other) noexcept;
@@ -41,9 +47,11 @@ export namespace ikk
     private:
         GLFWwindow* m_window = nullptr;
         Renderer m_renderer{};
-
         //TODO: Window settings...
         Color m_clearColor = Color::Miku;
+        Settings m_settings{};
+        //TODO:
+        Container m_defaultContainer{};
 
         void setupWindow() noexcept;
     };

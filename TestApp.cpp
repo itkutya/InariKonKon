@@ -9,23 +9,13 @@ public:
     explicit Menu(ikk::Application* application) noexcept
         : ikk::Scene(application)
     {
-        ikk::Clock timer{};
-
-        audio.loadFromFileAsync("/home/itkutya/Documents/c++/CLion/InariKonKonGameFramework/Resources/audio.mp3");
-
-        tex.loadFromFileAsync("/home/itkutya/Documents/c++/CLion/InariKonKonGameFramework/Resources/osu_logo.png");
-
-        tex.waitFor(ikk::seconds(0.1f));
-
-        audio.play();
-
-        while (tex.isLoading() == true)
-            ikk::Print("No data");
-
-        ikk::Resource::preloadFromFile<ikk::Texture>("Name", "Path");
-        //auto temp = ikk::Resource<ikk::Texture>::get("Name");
-
-        ikk::Print("Time it took: {}s", timer.getElapsedTime().asSeconds());
+        ikk::Percentage f{ .value = 2.f };
+        ikk::Extent ext{ .x = 55._p, .y = 266_px };
+        ikk::Print("Extent:\n\tx: {}\n\ty: {}", ext.x.value.value(), ext.y.value);
+        float impl = f;
+        unsigned int v = ext.y;
+        float ff = ext.x;
+        int I = 2;
     }
 
     void onEvent(const ikk::Event& event) noexcept override
@@ -40,8 +30,8 @@ public:
     {
     }
 private:
-    ikk::Texture tex{};
-    ikk::Audio audio{};
+    //            Displayed Text  Position     Size          Button theme stuff
+    //ikk::Button btn{"Text",    {25%, 25%}, {2%, 6%}, { .color = ikk::Color::Miku }};
 };
 
 int main()

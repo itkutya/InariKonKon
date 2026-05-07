@@ -97,18 +97,11 @@ namespace ikk
     {
     }
 
-    //TODO: Work on this for a bit more, it works for now...
     template<Number T>
     inline constexpr T convert(std::uint8_t value) noexcept
     {
         Clamped<std::uint8_t> temp{value};
-        if constexpr (std::is_class<T>::value == true)
-            return T{temp};
-        else
-        {
-            Clamped<T> clamped{temp};
-            return T{clamped.value()};
-        }
+        return T{temp};
     }
 
     template<Number T>

@@ -16,7 +16,7 @@ import :Renderer;
 import DebugFeatures;
 import NumericCasts;
 import Shader;
-import Log;
+import Print;
 
 export namespace ikk
 {

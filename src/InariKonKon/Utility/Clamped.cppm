@@ -112,7 +112,7 @@ export namespace ikk
         [[nodiscard]] constexpr bool operator<(T value) const noexcept;
         [[nodiscard]] constexpr bool operator>(T value) const noexcept;
 
-        [[nodiscard]] explicit constexpr operator T() const noexcept;
+        [[nodiscard]] constexpr operator T() const noexcept;
 
         [[nodiscard]] constexpr T value() const noexcept;
     private:
@@ -402,3 +402,10 @@ namespace ikk
         return static_cast<T>(value);
     }
 }
+
+template<ikk::Number T, T Min, T Max>
+struct std::numeric_limits<ikk::Clamped<T, Min, Max>>
+{
+    [[nodiscard]] inline static constexpr T min() noexcept { return Min; }
+    [[nodiscard]] inline static constexpr T max() noexcept { return Max; }
+};

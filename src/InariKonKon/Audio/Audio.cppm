@@ -10,7 +10,7 @@ export module Audio;
 
 import Resource;
 
-import Log;
+import Print;
 
 export namespace ikk
 {

@@ -9,6 +9,7 @@ export namespace ikk
     template<class T> requires std::is_enum<T>::value
     class [[nodiscard]] Flag final
     {
+        using UnderlyingType = typename std::underlying_type<T>::type;
     public:
         [[nodiscard]] constexpr Flag(T flags) noexcept;
 
@@ -21,6 +22,9 @@ export namespace ikk
         ~Flag() noexcept = default;
 
         [[nodiscard]] constexpr operator T() const noexcept;
+
+        [[nodiscard]] constexpr Flag operator|(T flag) const noexcept;
+        constexpr void operator|=(T flag) noexcept;
 
         [[nodiscard]] constexpr bool contains(T flag) const noexcept;
     private:
@@ -43,9 +47,21 @@ namespace ikk
     }
 
     template<class T> requires std::is_enum<T>::value
+    constexpr Flag<T> Flag<T>::operator|(T flag) const noexcept
+    {
+        return Flag<T>{static_cast<T>(static_cast<UnderlyingType>(this->m_flags) | static_cast<UnderlyingType>(flag))};
+    }
+
+    template<class T> requires std::is_enum<T>::value
+    constexpr void Flag<T>::operator|=(T flag) noexcept
+    {
+        const UnderlyingType v = static_cast<UnderlyingType>(this->m_flags) | static_cast<UnderlyingType>(flag);
+        this->m_flags = static_cast<T>(v);
+    }
+
+    template<class T> requires std::is_enum<T>::value
     constexpr bool Flag<T>::contains(T flag) const noexcept
     {
-        using U = std::underlying_type<T>::type;
-        return (static_cast<U>(this->m_flags) & static_cast<U>(flag)) == static_cast<U>(flag);
+        return static_cast<UnderlyingType>(static_cast<UnderlyingType>(this->m_flags) & static_cast<UnderlyingType>(flag)) == static_cast<UnderlyingType>(flag);
     }
 }

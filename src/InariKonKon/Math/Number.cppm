@@ -17,9 +17,7 @@ export namespace ikk
     template<Number T>
     [[nodiscard]] inline constexpr bool isZero(T value, T tolerance = std::numeric_limits<T>::epsilon()) noexcept
     {
-        if constexpr (std::is_floating_point<T>::value)
-            return std::abs(value) <= tolerance;
-        else
-            return value == T{0};
+        if constexpr (std::is_floating_point<T>::value) return std::abs(value) <= tolerance;
+        else return value == T{0};
     }
 }

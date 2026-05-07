@@ -9,7 +9,7 @@ module;
 #include "fmt/chrono.h"
 #include "fmt/std.h"
 
-export module Log;
+export module Print;
 
 import NonConstructible;
 import NonCopyable;
@@ -44,13 +44,13 @@ export namespace ikk
 namespace ikk
 {
     template<Log::Level level = Log::Level::Info, Log::Flags flags = Log::Flags::All>
-    class BasicLogger final : public NonCopyable, public NonMovable
+    class BasicPrint final : public NonCopyable, public NonMovable
     {
     public:
         template<class... Args>
-        BasicLogger(fmt::format_string<Args...> fmt, Args&&... args) noexcept;
+        BasicPrint(fmt::format_string<Args...> fmt, Args&&... args) noexcept;
 
-        ~BasicLogger() noexcept = default;
+        ~BasicPrint() noexcept = default;
     private:
         [[nodiscard]] static constexpr std::string_view convertToString(Log::Level severety) noexcept;
     };
@@ -59,17 +59,17 @@ namespace ikk
 export namespace ikk
 {
     template<Log::Level level = Log::Level::Info, Log::Flags flags = Log::Flags::All>
-    using DebugPrint = BasicLogger<level, static_cast<Log::Flags>(std::to_underlying(flags) | std::to_underlying(Log::Flags::Debug))>;
+    using DebugPrint = BasicPrint<level, static_cast<Log::Flags>(std::to_underlying(flags) | std::to_underlying(Log::Flags::Debug))>;
 
     template<Log::Level level = Log::Level::Info, Log::Flags flags = Log::Flags::All>
-    using Print = BasicLogger<level, flags>;
+    using Print = BasicPrint<level, flags>;
 }
 
 namespace ikk
 {
     template<Log::Level level, Log::Flags flags>
     template<class... Args>
-    BasicLogger<level, flags>::BasicLogger(fmt::format_string<Args...> fmt, Args&&... args) noexcept
+    BasicPrint<level, flags>::BasicPrint(fmt::format_string<Args...> fmt, Args&&... args) noexcept
     {
         const Flag<Log::Flags> flag{flags};
 
@@ -94,7 +94,7 @@ namespace ikk
     }
 
     template<Log::Level level, Log::Flags flags>
-    constexpr std::string_view BasicLogger<level, flags>::convertToString(Log::Level severety) noexcept
+    constexpr std::string_view BasicPrint<level, flags>::convertToString(Log::Level severety) noexcept
     {
         switch (severety)
         {

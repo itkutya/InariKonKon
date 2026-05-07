@@ -151,7 +151,7 @@ namespace ikk
     constexpr bool Rect<T>::contains(Vec2<U> point, Quaternionf rotation, Vec2f anchor) const noexcept
     {
         const Vec2<T> pivot =
-        { 
+        {
             this->m_left + (this->m_width * anchor.x()),
             this->m_top + (this->m_height * anchor.y())
         };

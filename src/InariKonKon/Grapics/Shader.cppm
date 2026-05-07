@@ -11,7 +11,7 @@ module;
 
 export module Shader;
 
-import Log;
+import Print;
 
 export namespace ikk
 {
