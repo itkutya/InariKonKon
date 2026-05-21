@@ -43,6 +43,8 @@ FetchContent_MakeAvailable(stb)
 find_package(Vulkan REQUIRED shaderc_combined)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE glfw fmt::fmt EnTT::EnTT Vulkan::Vulkan Vulkan::shaderc_combined miniaudio ${STEAMAUDIO_LIB} stb)
+target_compile_options(InariKonKonGameFramework PRIVATE -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2)
 
 add_executable(TestApp TestApp.cpp)
 target_link_libraries(TestApp InariKonKonGameFramework)
+target_compile_options(TestApp PRIVATE -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2)

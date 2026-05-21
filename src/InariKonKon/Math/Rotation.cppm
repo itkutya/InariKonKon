@@ -5,21 +5,26 @@ module;
 
 export module Rotation;
 
+import TypeUtils;
 import Number;
 import Angle;
 
 export namespace ikk
 {
-    template<template<class> class T, std::floating_point F> requires (std::is_same<T<F>, Degree<F>>::value || std::is_same<T<F>, Radian<F>>::value)
+    template<class T>
+    concept RotationType = Is<T>::template AnyOf<Degree<float>, Degree<double>, Degree<long double>,
+                                                 Radian<float>, Radian<double>, Radian<long double>>::value;
+
+    template<RotationType T>
     struct [[nodiscard]] Rotation
     {
-        T<F> yaw{};
-        T<F> pitch{};
-        T<F> roll{};
+        T yaw{};
+        T pitch{};
+        T roll{};
     };
 
-    template<Number T> using RotationDeg = Rotation<Degree, T>;
-    template<Number T> using RotationRad = Rotation<Radian, T>;
+    template<std::floating_point T> using RotationDeg = Rotation<Degree<T>>;
+    template<std::floating_point T> using RotationRad = Rotation<Radian<T>>;
 
     using RotationDegf = RotationDeg<float>;
     using RotationDegd = RotationDeg<double>;

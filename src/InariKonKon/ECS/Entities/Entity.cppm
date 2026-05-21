@@ -2,11 +2,12 @@ module;
 
 #include <cstdint>
 
-#include "entt/entity/registry.hpp"
+#include "entt/entt.hpp"
 
 export module ECS:Entity;
 
-import :EntityComponentSystem;
+import EntityComponentSystem;
+import Component;
 
 export namespace ikk
 {
@@ -30,18 +31,35 @@ export namespace ikk
         [[nodiscard]] bool isValid() const noexcept;
         [[nodiscard]] ID getID() const noexcept;
 
-        //TODO: Add other component stuff...
-        template<class T, class... Args>
+        template<ComponentType T, class... Args>
         void addComponent(Args&&... args) noexcept;
+
+        //TODO: Error handeling...
+        template<ComponentType T>
+        const T& getComponent() const noexcept;
+        template<ComponentType T>
+        T& getComponent() noexcept;
+
+        template<ComponentType T>
+        [[nodiscard]] bool hasComponent() const noexcept;
+
+        template<ComponentType T>
+        void removeComponent() noexcept;
 
         [[nodiscard]] bool operator==(const Entity& other) const noexcept;
         [[nodiscard]] bool operator!=(const Entity& other) const noexcept;
     private:
+        enum struct Mode : std::uint8_t
+        {
+            Owner, View
+        };
+
         entt::entity m_entity = entt::null;
+        Mode m_mode = Mode::Owner;
 
         [[nodiscard]] explicit Entity(entt::entity entity) noexcept;
 
-        template<class... Components>
+        template<ComponentType... Components>
         friend class System;
     };
 }
@@ -54,10 +72,13 @@ namespace ikk
     }
 
     Entity::Entity(const Entity& other) noexcept
-        : m_entity(ECS.getRegistry().create())
     {
-        //TODO:
-        //Copy other stuff...
+        //TODO: Test if this breaks stuff...
+        auto& registry = ECS.getRegistry();
+        this->m_entity = registry.create();
+        for(auto&& [id, storage] : registry.storage())
+            if(storage.contains(other.m_entity) == true)
+                storage.push(this->m_entity, storage.value(other.m_entity));
     }
 
     Entity::Entity(Entity&& other) noexcept
@@ -70,9 +91,13 @@ namespace ikk
     {
         if (this != &other)
         {
-            this->m_entity = ECS.getRegistry().create();
-            //TODO:
-            //Copy other stuff...
+            //TODO: Test if this breaks stuff...
+            auto& registry = ECS.getRegistry();
+            this->m_entity = registry.create();
+            this->m_mode = Mode::Owner;
+            for(auto&& [id, storage] : registry.storage())
+                if(storage.contains(other.m_entity) == true)
+                    storage.push(this->m_entity, storage.value(other.m_entity));
         }
         return *this;
     }
@@ -82,6 +107,7 @@ namespace ikk
         if (this != &other)
         {
             this->m_entity = other.m_entity;
+            this->m_mode = Mode::Owner;
             other.m_entity = entt::null;
         }
         return *this;
@@ -89,7 +115,7 @@ namespace ikk
 
     Entity::~Entity() noexcept
     {
-        if (this->isValid() == true)
+        if (this->isValid() == true && this->m_mode != Mode::View)
             ECS.getRegistry().destroy(this->m_entity);
     }
 
@@ -120,14 +146,38 @@ namespace ikk
     }
 
     Entity::Entity(entt::entity entity) noexcept
-        : m_entity(entity)
+        : m_entity(entity), m_mode(Mode::View)
     {
     }
 
-    template<class T, class... Args>
+    template<ComponentType T, class... Args>
     void Entity::addComponent(Args&&... args) noexcept
     {
         if (isValid() == false) return;
         ECS.getRegistry().emplace<T>(this->m_entity, std::forward<Args>(args)...);
+    }
+
+    template<ComponentType T>
+    const T& Entity::getComponent() const noexcept
+    {
+        return ECS.getRegistry().get<T>(this->m_entity);
+    }
+
+    template<ComponentType T>
+    T& Entity::getComponent() noexcept
+    {
+        return ECS.getRegistry().get<T>(this->m_entity);
+    }
+
+    template<ComponentType T>
+    bool Entity::hasComponent() const noexcept
+    {
+        return ECS.getRegistry().all_of<T>(this->m_entity);
+    }
+
+    template<ComponentType T>
+    void Entity::removeComponent() noexcept
+    {
+        ECS.getRegistry().remove<T>(this->m_entity);
     }
 }

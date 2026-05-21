@@ -6,9 +6,10 @@ module;
 export module Quaternion;
 
 import Rotation;
+import Number;
+import Matrix;
+import Vector;
 import Angle;
-import Mat;
-import Vec;
 
 export namespace ikk
 {

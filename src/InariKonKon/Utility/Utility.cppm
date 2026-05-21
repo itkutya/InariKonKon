@@ -19,3 +19,5 @@ export import Flag;
 export import Print;
 
 export import ThreadPool;
+
+export import TypeUtils;

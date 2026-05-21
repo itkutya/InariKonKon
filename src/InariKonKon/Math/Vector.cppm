@@ -9,7 +9,7 @@ module;
 #include <cmath>
 #include <span>
 
-export module Vec;
+export module Vector;
 
 import Number;
 
@@ -20,6 +20,7 @@ export namespace ikk
     {
         static_assert(N >= 1);
     public:
+        inline static constexpr std::size_t Dimension = N;
         using Type = T;
 
         constexpr Vec() noexcept = default;
@@ -44,10 +45,14 @@ export namespace ikk
         template<Number U> requires (std::is_convertible<U, T>::value)
         constexpr Vec<N, T>& operator=(Vec<N, U>&& other) noexcept;
 
+        template<std::size_t S, Number U>
+        constexpr Vec(const Vec<S, U>& other) noexcept;
+        template<std::size_t S, Number U>
+        constexpr Vec(Vec<S, U>&& other) noexcept;
+
         constexpr ~Vec() noexcept = default;
 
         [[nodiscard]] constexpr const std::array<T, N>& data() const noexcept;
-        [[nodiscard]] constexpr std::array<T, N>& data() noexcept;
 
         [[nodiscard]] constexpr const T& at(std::size_t index) const noexcept;
         [[nodiscard]] constexpr T& at(std::size_t index) noexcept;
@@ -261,13 +266,27 @@ namespace ikk
     }
 
     template<std::size_t N, Number T>
-    constexpr const std::array<T, N>& Vec<N, T>::data() const noexcept
+    template<std::size_t S, Number U>
+    constexpr Vec<N, T>::Vec(const Vec<S, U>& other) noexcept
     {
-        return this->m_data;
+        if constexpr (S <= N)
+            std::copy(other.data().begin(), other.data().end(), this->m_data.begin());
+        else
+            for (std::size_t i = 0; i < N; i++) this->m_data.at(i) = static_cast<T>(other.data().at(i));
     }
 
     template<std::size_t N, Number T>
-    constexpr std::array<T, N>& Vec<N, T>::data() noexcept
+    template<std::size_t S, Number U>
+    constexpr Vec<N, T>::Vec(Vec<S, U>&& other) noexcept
+    {
+        if constexpr (S <= N)
+            std::move(other.data().begin(), other.data().end(), this->m_data.begin());
+        else
+            for (std::size_t i = 0; i < N; i++) this->m_data.at(i) = static_cast<T>(other.data().at(i));
+    }
+
+    template<std::size_t N, Number T>
+    constexpr const std::array<T, N>& Vec<N, T>::data() const noexcept
     {
         return this->m_data;
     }

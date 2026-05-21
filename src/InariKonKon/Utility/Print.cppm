@@ -38,6 +38,9 @@ export namespace ikk
             Debug       = 1 << 2,
             All         = None | Date | Severity
         };
+
+        using enum Level;
+        using enum Flags;
     };
 }
 

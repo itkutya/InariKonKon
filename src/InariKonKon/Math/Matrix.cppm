@@ -6,10 +6,10 @@ module;
 #include <array>
 #include <span>
 
-export module Mat;
+export module Matrix;
 
 import Number;
-import Vec;
+import Vector;
 
 export namespace ikk
 {
@@ -23,6 +23,8 @@ export namespace ikk
     {
         static_assert(Rows >= 1 && Cols >= 1);
     public:
+        using Type = T;
+
         constexpr Mat() noexcept = default;
         constexpr Mat(T value) noexcept;
         constexpr Mat(std::span<T, Rows * Cols> span) noexcept;
@@ -194,7 +196,7 @@ namespace ikk
         Mat<Rows, Cols, T, U> result{};
         for (std::size_t r = 0; r < Rows; ++r)
             for (std::size_t c = 0; c < Cols; ++c)
-                result(r, c) = (*this)(r, c);
+                result(r, c) = this->at(r, c);
         return result;
     }
 
@@ -223,7 +225,7 @@ namespace ikk
         for (std::size_t i = 0; i < Rows; ++i)
             for (std::size_t j = 0; j < Cols; ++j)
                 for (std::size_t k = 0; k < Cols; ++k)
-                    result(i, j) += (*this)(i, k) * rhs(k, j);
+                    result(i, j) += this->at(i, k) * rhs(k, j);
         return result;
     }
 
@@ -333,7 +335,7 @@ namespace ikk
         {
             T sum{};
             for (std::size_t j = 0; j < Cols; ++j)
-                sum += (*this)(i, j) * vec[j];
+                sum += this->at(i, j) * vec[j];
             result[i] = sum;
         }
         return result;
@@ -345,7 +347,7 @@ namespace ikk
         Mat tmp = *this;
         for (std::size_t r = 0; r < Rows; ++r)
             for (std::size_t c = 0; c < Cols; ++c)
-                (*this)(r, c) = tmp(c, r);
+                this->at(r, c) = tmp(c, r);
     }
 
     template<std::size_t Rows, std::size_t Cols, Number T, MatrixOrdering O>
@@ -404,7 +406,7 @@ namespace ikk
     {
         Vec<Cols, T> result{};
         for (std::size_t c = 0; c < Cols; ++c)
-            result[c] = (*this)(row, c);
+            result[c] = this->at(row, c);
         return result;
     }
 
@@ -413,7 +415,7 @@ namespace ikk
     {
         Vec<Rows, T> result{};
         for (std::size_t r = 0; r < Rows; ++r)
-            result[r] = (*this)(r, column);
+            result[r] = this->at(r, column);
         return result;
     }
 
@@ -421,13 +423,13 @@ namespace ikk
     constexpr void Mat<Rows, Cols, T, O>::setRow(std::size_t row, Vec<Cols, T> data) noexcept
     {
         for (std::size_t c = 0; c < Cols; ++c)
-            (*this)(row, c) = data[c];
+            this->at(row, c) = data[c];
     }
 
     template<std::size_t Rows, std::size_t Cols, Number T, MatrixOrdering O>
     constexpr void Mat<Rows, Cols, T, O>::setColumn(std::size_t column, Vec<Rows, T> data) noexcept
     {
         for (std::size_t r = 0; r < Rows; ++r)
-            (*this)(r, column) = data[r];
+            this->at(r, column) = data[r];
     }
 }

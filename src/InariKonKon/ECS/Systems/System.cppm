@@ -1,17 +1,19 @@
 module;
 
-#include <utility>
+#include <concepts>
 
-#include "entt/entity/registry.hpp"
+#include "entt/entt.hpp"
 
 export module ECS:System;
 
-import :EntityComponentSystem;
 import :Entity;
+
+import EntityComponentSystem;
+import Component;
 
 export namespace ikk
 {
-    template<class... Components>
+    template<ComponentType... Components>
     class System final
     {
     public:
@@ -25,7 +27,7 @@ export namespace ikk
 
         ~System() noexcept = default;
 
-        template<class Func, class... Args>
+        template<class Func, class... Args> requires (std::invocable<Func, const Entity&, Components&..., Args&&...>)
         static void update(Func&& func, Args&&... args) noexcept;
     private:
     };
@@ -33,16 +35,14 @@ export namespace ikk
 
 namespace ikk
 {
-    template<class... Components>
-    template<class Func, class... Args>
+    template<ComponentType... Components>
+    template<class Func, class... Args> requires (std::invocable<Func, const Entity&, Components&..., Args&&...>)
     void System<Components...>::update(Func&& func, Args&&... args) noexcept
     {
-        auto view = ECS.getRegistry().view<Components...>();
-        view.each([&func, &args...](const auto& entity, auto&... components) noexcept
-        {
-            Entity ent{ entity };
-            std::forward<Func>(func)(ent, components..., std::forward<Args>(args)...);
-            ent.m_entity = entt::null;
-        });
+        ECS.getRegistry().view<Components...>().each(
+            [&func, &args...](const entt::entity entity, auto&... components) noexcept
+            {
+                func(Entity{entity}, components..., args...);
+            });
     }
 }

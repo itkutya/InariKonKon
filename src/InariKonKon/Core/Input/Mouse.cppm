@@ -11,6 +11,7 @@ export module Core:Mouse;
 import :Input;
 
 import NonConstructible;
+import Vector;
 
 export namespace ikk
 {
@@ -39,11 +40,17 @@ export namespace ikk
 
         using enum Button;
 
+        [[nodiscard]] static Vec2d getPosition() noexcept;
+        [[nodiscard]] static double getWheelPosition(Mouse::Wheel wheel) noexcept;
+
         [[nodiscard]] static constexpr std::string_view toString(Button button) noexcept;
         [[nodiscard]] static constexpr std::string_view toString(Wheel wheel) noexcept;
     private:
         [[nodiscard]] static constexpr std::int32_t toGLFWButton(Mouse::Button button) noexcept;
         [[nodiscard]] static constexpr Mouse::Button fromGLFWButton(std::int32_t button) noexcept;
+
+        inline static Vec2d s_position{};
+        inline static Vec2d s_scrollFactor{};
 
         friend class EventCallbackFuncs;
     };
@@ -56,6 +63,22 @@ namespace ikk
 
     template<>
     struct isInputType<Mouse::Wheel> : std::true_type {};
+
+    Vec2d Mouse::getPosition() noexcept
+    {
+        return s_position;
+    }
+
+    double Mouse::getWheelPosition(Mouse::Wheel wheel) noexcept
+    {
+        switch (wheel)
+        {
+        case Mouse::Wheel::Horizontal:  return s_scrollFactor.x();
+        case Mouse::Wheel::Vertical:    return s_scrollFactor.y();
+        case Mouse::Wheel::Unknown:     return 0.0;
+        }
+        return 0.0;
+    }
 
     constexpr std::string_view Mouse::toString(Button button) noexcept
     {

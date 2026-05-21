@@ -16,8 +16,8 @@ import :Event;
 import :Input;
 
 import NonConstructible;
+import Vector;
 import Print;
-import Vec;
 
 export namespace ikk
 {
@@ -87,9 +87,7 @@ namespace ikk
     void EventCallbackFuncs::framebufferResizeCallback(GLFWwindow* window, int width, int height) noexcept
     {
         auto* ptr = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        eventManager.emplace(WindowEvent::FramebufferResized{
-            .window = ptr, .width = U32(width), .height = U32(height)
-        });
+        eventManager.emplace(WindowEvent::FramebufferResized{ .window = ptr, .width = U32(width), .height = U32(height) });
     }
 
     void EventCallbackFuncs::windowContentScaleCallback(GLFWwindow* window, float xscale, float yscale) noexcept
@@ -133,12 +131,8 @@ namespace ikk
 
     void EventCallbackFuncs::monitorCallback(GLFWmonitor* monitor, int event) noexcept
     {
-        if (event == GLFW_CONNECTED) eventManager.emplace(Event::Monitor::Connected{
-            .monitor = reinterpret_cast<Monitor*>(monitor)
-        });
-        else if (event == GLFW_DISCONNECTED) eventManager.emplace(Event::Monitor::Disconnected{
-            .monitor = reinterpret_cast<Monitor*>(monitor)
-        });
+        if (event == GLFW_CONNECTED) eventManager.emplace(Event::Monitor::Connected{ .monitor = reinterpret_cast<Monitor*>(monitor) });
+        else if (event == GLFW_DISCONNECTED) eventManager.emplace(Event::Monitor::Disconnected{ .monitor = reinterpret_cast<Monitor*>(monitor) });
     }
 
     void EventCallbackFuncs::cursorEnterCallback(GLFWwindow* window, int entered) noexcept
@@ -175,6 +169,9 @@ namespace ikk
 
     void EventCallbackFuncs::mouseScrollCallback([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) noexcept
     {
+        Mouse::s_scrollFactor.x() += xoffset;
+        Mouse::s_scrollFactor.y() += yoffset;
+
         if (xoffset != 0.0)
         {
             eventManager.emplace(InputEvent::Mouse::Wheel{ .wheel = Mouse::Wheel::Horizontal, .delta = xoffset });
@@ -190,6 +187,8 @@ namespace ikk
 
     void EventCallbackFuncs::cursorPositionCallback([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) noexcept
     {
+        Mouse::s_position = Vec2d{ xpos, ypos };
+
         eventManager.emplace(InputEvent::Mouse::Move{ .position = { xpos, ypos } });
     }
 

@@ -25,6 +25,8 @@ export namespace ikk
         struct [[nodiscard]] Settings
         {
             Color clearColor = Color::Miku;
+            std::uint32_t width = 800;
+            std::uint32_t height = 600;
         };
 
         [[nodiscard]] Window(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept;
@@ -43,7 +45,9 @@ export namespace ikk
         void render() const noexcept;
 
         [[nodiscard]] const std::shared_ptr<Renderer::Type>& getRenderer() const noexcept;
-        [[nodiscard]] std::shared_ptr<Renderer::Type>& getRenderer() noexcept;
+
+        [[nodiscard]] std::uint32_t getWidth() const noexcept;
+        [[nodiscard]] std::uint32_t getHeight() const noexcept;
     private:
         GLFWwindow* m_window = nullptr;
         Renderer m_renderer{};
@@ -151,9 +155,14 @@ namespace ikk
         return this->m_renderer.get();
     }
 
-    std::shared_ptr<Renderer::Type>& Window::getRenderer() noexcept
+    std::uint32_t Window::getWidth() const noexcept
     {
-        return this->m_renderer.get();
+        return this->m_settings.width;
+    }
+
+    std::uint32_t Window::getHeight() const noexcept
+    {
+        return this->m_settings.height;
     }
 
     void Window::setupWindow() noexcept

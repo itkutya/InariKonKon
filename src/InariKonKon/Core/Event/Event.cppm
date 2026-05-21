@@ -16,8 +16,8 @@ import :Mouse;
 import :Input;
 
 import NonConstructible;
+import Vector;
 import Flag;
-import Vec;
 
 template<typename T, typename Variant>
 struct isVariantMember;

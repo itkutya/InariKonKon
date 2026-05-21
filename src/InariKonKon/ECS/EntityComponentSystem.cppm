@@ -2,7 +2,7 @@ module;
 
 #include "entt/entity/registry.hpp"
 
-export module ECS:EntityComponentSystem;
+export module EntityComponentSystem;
 
 import Singleton;
 
