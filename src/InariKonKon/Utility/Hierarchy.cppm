@@ -22,7 +22,7 @@ export namespace ikk
         void addChild(T& child) noexcept;
         void removeChild(T& child) noexcept;
     protected:
-        Hierarchy() noexcept;
+        Hierarchy() noexcept = default;
 
         Hierarchy(const Hierarchy&) noexcept = default;
         Hierarchy(Hierarchy&&) noexcept = default;
@@ -44,12 +44,6 @@ export namespace ikk
 namespace ikk
 {
     template<class T>
-    Hierarchy<T>::Hierarchy() noexcept
-    {
-        static_assert(std::derived_from<T, Hierarchy<T>>);
-    }
-
-    template<class T>
     const T* Hierarchy<T>::getParent() const noexcept
     {
         return this->m_parent;
@@ -62,13 +56,13 @@ namespace ikk
     }
 
     template<class T>
-    std::vector<T*>& Hierarchy<T>::getChildren() noexcept
+    const std::vector<T*>& Hierarchy<T>::getChildren() const noexcept
     {
         return this->m_children;
     }
 
     template<class T>
-    const std::vector<T*>& Hierarchy<T>::getChildren() const noexcept
+    std::vector<T*>& Hierarchy<T>::getChildren() noexcept
     {
         return this->m_children;
     }
@@ -78,11 +72,10 @@ namespace ikk
     {
         if (this->m_parent == &parent) return;
 
-        for (T* p = &parent; p != nullptr; p = p->getParent())
-            if (p == &this->self()) return;
+        for (T* p = &parent; p != nullptr; p = p->getParent()) if (p == &this->self()) return;
 
-        if (this->m_parent != nullptr)
-            static_cast<Hierarchy<T>*>(this->m_parent)->removeChild(this->self());
+        if (this->m_parent != nullptr) this->m_parent->removeChild(this->self());
+
         this->m_parent = &parent;
         parent.addChild(this->self());
     }
@@ -90,8 +83,7 @@ namespace ikk
     template<class T>
     void Hierarchy<T>::removeParent() noexcept
     {
-        if (this->m_parent != nullptr)
-            static_cast<Hierarchy<T>*>(this->m_parent)->removeChild(this->self());
+        if (this->m_parent != nullptr) this->m_parent->removeChild(this->self());
         this->m_parent = nullptr;
     }
 
@@ -100,10 +92,9 @@ namespace ikk
     {
         if (std::ranges::find(this->m_children, &child) == this->m_children.end())
         {
-            if (child.getParent() != nullptr)
-                static_cast<Hierarchy<T>*>(&child)->removeParent();
+            if (child.getParent() != nullptr) child.removeParent();
 
-            static_cast<Hierarchy<T>*>(&child)->m_parent = &this->self();
+            child.m_parent = &this->self();
             this->m_children.emplace_back(&child);
         }
     }
@@ -113,7 +104,7 @@ namespace ikk
     {
         if (auto it = std::ranges::find(this->m_children, &child); it != this->m_children.end())
         {
-            static_cast<Hierarchy<T>*>(*it)->m_parent = nullptr;
+            it->m_parent = nullptr;
             this->m_children.erase(it);
         }
     }

@@ -14,8 +14,11 @@ import :EventCallbackFuncs;
 import :Renderer;
 import :Vulkan;
 
-import Container;
+import NumericCasts;
+import Vector;
 import Color;
+import Rect;
+import UI;
 
 export namespace ikk
 {
@@ -27,6 +30,7 @@ export namespace ikk
             Color clearColor = Color::Miku;
             std::uint32_t width = 800;
             std::uint32_t height = 600;
+            //TODO: Other stuff...
         };
 
         [[nodiscard]] Window(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept;
@@ -51,19 +55,22 @@ export namespace ikk
     private:
         GLFWwindow* m_window = nullptr;
         Renderer m_renderer{};
-        //TODO: Window settings...
-        Color m_clearColor = Color::Miku;
         Settings m_settings{};
-        //TODO:
-        Container m_defaultContainer{};
+
+        Container m_defaultContainer;
 
         void setupWindow() noexcept;
+
+        void onResize(std::uint32_t width, std::uint32_t height) noexcept;
+
+        friend class Application;
     };
 }
 
 namespace ikk
 {
     Window::Window(std::u8string_view title, std::uint32_t width, std::uint32_t height) noexcept
+        : m_defaultContainer(Rectf{Vec2f{ 0.f, 0.f }, Vec2f{ F32(width), F32(height) }})
     {
         if (glfwInit() == GLFW_FALSE)
             return;
@@ -77,6 +84,7 @@ namespace ikk
     }
 
     Window::Window(const Window& other) noexcept
+        : m_defaultContainer(other.m_defaultContainer)
     {
         if (this != &other)
         {
@@ -90,7 +98,9 @@ namespace ikk
     }
 
     Window::Window(Window&& other) noexcept
-        : m_window(std::exchange(other.m_window, nullptr)), m_renderer(std::move(other.m_renderer))
+        : m_window(std::exchange(other.m_window, nullptr)),
+          m_renderer(std::move(other.m_renderer)),
+          m_defaultContainer(std::move(other.m_defaultContainer))
     {
     }
 
@@ -98,6 +108,8 @@ namespace ikk
     {
         if (this != &other)
         {
+            this->m_defaultContainer = other.m_defaultContainer;
+
             if (this->m_window != nullptr)
                 glfwDestroyWindow(this->m_window);
 
@@ -115,6 +127,8 @@ namespace ikk
     {
         if (this != &other)
         {
+            this->m_defaultContainer = std::move(other.m_defaultContainer);
+
             if (this->m_window != nullptr)
                 glfwDestroyWindow(this->m_window);
 
@@ -145,7 +159,7 @@ namespace ikk
 
     void Window::render() const noexcept
     {
-        this->getRenderer()->beginRender(this->m_clearColor);
+        this->getRenderer()->beginRender(this->m_settings.clearColor);
         //TODO: Draw stuff here...
         this->getRenderer()->endRender();
     }
@@ -193,5 +207,12 @@ namespace ikk
         glfwSetDropCallback(this->m_window, EventCallbackFuncs::dropCallback);
         glfwSetMonitorCallback(EventCallbackFuncs::monitorCallback);
         glfwSetJoystickCallback(EventCallbackFuncs::joystickCallback);
+    }
+
+    void Window::onResize(std::uint32_t width, std::uint32_t height) noexcept
+    {
+        this->m_defaultContainer.resize(Rectf{Vec2f{ 0.f, 0.f }, Vec2f{ F32(width), F32(height) }});
+        //TODO:
+        //this->m_renderer->resize();
     }
 }

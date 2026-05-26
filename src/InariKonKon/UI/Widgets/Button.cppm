@@ -4,16 +4,14 @@ module;
 
 export module Button;
 
-import UIBase;
-import Theme;
-import Rect;
+import UI;
 
 export namespace ikk
 {
-    class [[nodiscard]] Button final : public UIBase
+    class [[nodiscard]] Button final : public UIElement
     {
     public:
-        [[nodiscard]] explicit Button(std::string_view text, Rectu rect, const Theme& theme = Theme::Default()) noexcept;
+        [[nodiscard]] explicit Button(std::string_view text, Extent position, Extent size, const Theme& theme = Theme::Default()) noexcept;
 
         Button(const Button&) noexcept = default;
         Button(Button&&) noexcept = default;
@@ -28,8 +26,8 @@ export namespace ikk
 
 namespace ikk
 {
-    Button::Button(std::string_view text, Rectu rect, const Theme& theme) noexcept
-        : UIBase(rect)
+    Button::Button(std::string_view text, Extent position, Extent size, const Theme& theme) noexcept
+        : UIElement(position, size)
     {
     }
 }

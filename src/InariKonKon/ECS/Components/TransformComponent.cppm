@@ -107,6 +107,15 @@ export namespace ikk
         mutable MatType m_localMatrix = MatType::Identity();
         mutable MatType m_worldMatrix = MatType::Identity();
 
+        constexpr MatType getTranslationMatrix() const noexcept requires(D == Dimension::_3D);
+        constexpr MatType getTranslationMatrix() const noexcept requires(D == Dimension::_2D);
+
+        constexpr MatType getRotationMatrix() const noexcept requires(D == Dimension::_3D);
+        constexpr MatType getRotationMatrix() const noexcept requires(D == Dimension::_2D);
+
+        constexpr MatType getScaleMatrix() const noexcept requires(D == Dimension::_3D);
+        constexpr MatType getScaleMatrix() const noexcept requires(D == Dimension::_2D);
+
         constexpr void recalculateMatrices() const noexcept;
         void markDirty() noexcept;
     };
@@ -318,32 +327,62 @@ namespace ikk
     }
 
     template<Dimension D>
-    constexpr void Transform<D>::recalculateMatrices() const noexcept
+    constexpr Transform<D>::MatType Transform<D>::getTranslationMatrix() const noexcept requires (D == Dimension::_3D)
     {
         Transform<D>::MatType translation = Transform<D>::MatType::Identity();
+        translation.setColumn(3, Vec4f{ this->m_localPosition.x(), this->m_localPosition.y(), this->m_localPosition.z(), 1.f });
+        return translation;
+    }
+
+    template<Dimension D>
+    constexpr Transform<D>::MatType Transform<D>::getTranslationMatrix() const noexcept requires (D == Dimension::_2D)
+    {
+        Transform<D>::MatType translation = Transform<D>::MatType::Identity();
+        translation.setColumn(2, Vec3f{ this->m_localPosition.x(), this->m_localPosition.y(), 1.f });
+        return translation;
+    }
+
+    template<Dimension D>
+    constexpr Transform<D>::MatType Transform<D>::getRotationMatrix() const noexcept requires (D == Dimension::_3D)
+    {
         Transform<D>::MatType rotation = Transform<D>::MatType::Identity();
+        rotation = this->m_localRotation.toMat4x4();
+        return rotation;
+    }
+
+    template<Dimension D>
+    constexpr Transform<D>::MatType Transform<D>::getRotationMatrix() const noexcept requires (D == Dimension::_2D)
+    {
+        Transform<D>::MatType rotation = Transform<D>::MatType::Identity();
+        rotation = this->m_localRotation.toMat3x3();
+        return rotation;
+    }
+
+    template<Dimension D>
+    constexpr Transform<D>::MatType Transform<D>::getScaleMatrix() const noexcept requires (D == Dimension::_3D)
+    {
         Transform<D>::MatType scale = Transform<D>::MatType::Identity();
+        scale.at(0, 0) = this->m_localScale.x();
+        scale.at(1, 1) = this->m_localScale.y();
+        scale.at(2, 2) = this->m_localScale.z();
+        return scale;
+    }
 
-        //TODO: Fix this so it does not need the if statement...
-        if constexpr (D == Dimension::_2D)
-        {
-            translation.setColumn(2, Vec3f{ this->m_localPosition.x(), this->m_localPosition.y(), 1.f });
+    template<Dimension D>
+    constexpr Transform<D>::MatType Transform<D>::getScaleMatrix() const noexcept requires (D == Dimension::_2D)
+    {
+        Transform<D>::MatType scale = Transform<D>::MatType::Identity();
+        scale.at(0, 0) = this->m_localScale.x();
+        scale.at(1, 1) = this->m_localScale.y();
+        return scale;
+    }
 
-            rotation = this->m_localRotation.toMat3x3();
-
-            scale.at(0, 0) = this->m_localScale.x();
-            scale.at(1, 1) = this->m_localScale.y();
-        }
-        else
-        {
-            translation.setColumn(3, Vec4f{ this->m_localPosition.x(), this->m_localPosition.y(), this->m_localPosition.z(), 1.f });
-
-            rotation = this->m_localRotation.toMat4x4();
-
-            scale.at(0, 0) = this->m_localScale.x();
-            scale.at(1, 1) = this->m_localScale.y();
-            scale.at(2, 2) = this->m_localScale.z();
-        }
+    template<Dimension D>
+    constexpr void Transform<D>::recalculateMatrices() const noexcept
+    {
+        Transform<D>::MatType translation = this->getTranslationMatrix();
+        Transform<D>::MatType rotation = this->getRotationMatrix();
+        Transform<D>::MatType scale = this->getScaleMatrix();
 
         this->m_localMatrix = translation * rotation * scale;
 

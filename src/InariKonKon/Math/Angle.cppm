@@ -39,3 +39,63 @@ export namespace ikk
         return Radian<T>{ .value = deg.value * (std::numbers::pi_v<T> / static_cast<T>(180.f)) };
     }
 }
+
+export [[nodiscard]] inline constexpr ikk::Degreef operator""_deg(long double value) noexcept
+{
+    return ikk::Degreef{ .value = static_cast<float>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Radianf operator""_rad(long double value) noexcept
+{
+    return ikk::Radianf{ .value = static_cast<float>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Degreef operator""_degf(long double value) noexcept
+{
+    return ikk::Degreef{ .value = static_cast<float>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Radianf operator""_radf(long double value) noexcept
+{
+    return ikk::Radianf{ .value = static_cast<float>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Degreed operator""_degd(long double value) noexcept
+{
+    return ikk::Degreed{ .value = static_cast<double>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Radiand operator""_radd(long double value) noexcept
+{
+    return ikk::Radiand{ .value = static_cast<double>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Degreef operator""_deg(unsigned long long value) noexcept
+{
+    return ikk::Degreef{ .value = static_cast<float>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Radianf operator""_rad(unsigned long long value) noexcept
+{
+    return ikk::Radianf{ .value = static_cast<float>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Degreef operator""_degf(unsigned long long value) noexcept
+{
+    return ikk::Degreef{ .value = static_cast<float>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Radianf operator""_radf(unsigned long long value) noexcept
+{
+    return ikk::Radianf{ .value = static_cast<float>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Degreed operator""_degd(unsigned long long value) noexcept
+{
+    return ikk::Degreed{ .value = static_cast<double>(value) };
+}
+
+export [[nodiscard]] inline constexpr ikk::Radiand operator""_radd(unsigned long long value) noexcept
+{
+    return ikk::Radiand{ .value = static_cast<double>(value) };
+}

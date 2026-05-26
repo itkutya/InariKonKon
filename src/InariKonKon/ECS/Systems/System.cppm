@@ -1,5 +1,6 @@
 module;
 
+#include <type_traits>
 #include <concepts>
 
 #include "entt/entt.hpp"
@@ -11,38 +12,42 @@ import :Entity;
 import EntityComponentSystem;
 import Component;
 
+import NonConstructible;
+
 export namespace ikk
 {
-    template<ComponentType... Components>
-    class System final
+    template<auto Func, ComponentType... Components>
+    struct System final : public NonConstructible
     {
-    public:
-        System() noexcept = default;
+        template<class... Args> requires (std::invocable<decltype(Func), const Entity&, Components&..., Args&&...>)
+        static void update(Args&&... args) noexcept(std::is_nothrow_invocable<decltype(Func), const Entity&, Components&..., Args&&...>::value);
 
-        System(const System&) noexcept = default;
-        System(System&&) noexcept = default;
-
-        System& operator=(const System&) noexcept = default;
-        System& operator=(System&&) noexcept = default;
-
-        ~System() noexcept = default;
-
-        template<class Func, class... Args> requires (std::invocable<Func, const Entity&, Components&..., Args&&...>)
-        static void update(Func&& func, Args&&... args) noexcept;
-    private:
+        template<class... Args> requires (std::invocable<decltype(Func), Components&..., Args&&...>)
+        static void update(Args&&... args) noexcept(std::is_nothrow_invocable<decltype(Func), Components&..., Args&&...>::value);
     };
 }
 
 namespace ikk
 {
-    template<ComponentType... Components>
-    template<class Func, class... Args> requires (std::invocable<Func, const Entity&, Components&..., Args&&...>)
-    void System<Components...>::update(Func&& func, Args&&... args) noexcept
+    template<auto Func, ComponentType... Components>
+    template<class... Args> requires (std::invocable<decltype(Func), const Entity&, Components&..., Args&&...>)
+    void System<Func, Components...>::update(Args&&... args) noexcept(std::is_nothrow_invocable<decltype(Func), const Entity&, Components&..., Args&&...>::value)
     {
         ECS.getRegistry().view<Components...>().each(
-            [&func, &args...](const entt::entity entity, auto&... components) noexcept
+            [&](const entt::entity entity, Components&... components) noexcept
             {
-                func(Entity{entity}, components..., args...);
+                Func(Entity{ entity }, components..., std::forward<Args>(args)...);
+            });
+    }
+
+    template<auto Func, ComponentType ... Components>
+    template<class... Args> requires (std::invocable<decltype(Func), Components&..., Args&&...>)
+    void System<Func, Components...>::update(Args&&... args) noexcept(std::is_nothrow_invocable<decltype(Func), Components&..., Args&&...>::value)
+    {
+        ECS.getRegistry().view<Components...>().each(
+            [&](Components&... components) noexcept
+            {
+                Func(components..., std::forward<Args>(args)...);
             });
     }
 }

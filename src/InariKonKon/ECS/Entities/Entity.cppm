@@ -59,8 +59,8 @@ export namespace ikk
 
         [[nodiscard]] explicit Entity(entt::entity entity) noexcept;
 
-        template<ComponentType... Components>
-        friend class System;
+        template<auto Func, ComponentType... Components>
+        friend struct System;
     };
 }
 
@@ -115,7 +115,7 @@ namespace ikk
 
     Entity::~Entity() noexcept
     {
-        if (this->isValid() == true && this->m_mode != Mode::View)
+        if (this->isValid() == true && this->m_mode == Mode::Owner)
             ECS.getRegistry().destroy(this->m_entity);
     }
 
@@ -143,11 +143,6 @@ namespace ikk
     bool Entity::operator!=(const Entity& other) const noexcept
     {
         return this->m_entity != other.m_entity;
-    }
-
-    Entity::Entity(entt::entity entity) noexcept
-        : m_entity(entity), m_mode(Mode::View)
-    {
     }
 
     template<ComponentType T, class... Args>
@@ -179,5 +174,10 @@ namespace ikk
     void Entity::removeComponent() noexcept
     {
         ECS.getRegistry().remove<T>(this->m_entity);
+    }
+
+    Entity::Entity(entt::entity entity) noexcept
+        : m_entity(entity), m_mode(Mode::View)
+    {
     }
 }

@@ -1,6 +1,6 @@
 module;
 
-#include <cstdint>
+#include <variant>
 
 export module Extent;
 
@@ -11,11 +11,11 @@ export namespace ikk
 {
     struct [[nodiscard]] Pixel final
     {
-        using Type = std::uint32_t;
+        using Type = float;
 
-        std::uint32_t value{};
+        Type value{};
 
-        [[nodiscard]] constexpr operator std::uint32_t() const noexcept;
+        [[nodiscard]] constexpr operator Type() const noexcept;
     };
 
     struct [[nodiscard]] Percentage final
@@ -38,24 +38,20 @@ export namespace ikk
     };
 
     template<class T>
-    concept Unit = Is<T>::template AnyOf<Pixel, Percentage, Fill, Shrink>::value;
+    concept UnitType = Is<T>::template AnyOf<Pixel, Percentage, Fill, Shrink>::value;
 
-    //TODO: Since this is templated when using in internaly
-    //i should just use a different one that only stores pixel
-    //data instead of percentage or something else...
-    //This should only be used to calculate absolute stuff...
-
-    template<Unit T = Fill, Unit U = Fill>
     struct [[nodiscard]] Extent final
     {
-        T x{};
-        U y{};
+        using Unit = std::variant<Pixel, Percentage, Fill, Shrink>;
+
+        Unit x = Fill{};
+        Unit y = Fill{};
     };
 }
 
 namespace ikk
 {
-    constexpr Pixel::operator unsigned int() const noexcept
+    constexpr Pixel::operator Type() const noexcept
     {
         return this->value;
     }
@@ -68,7 +64,7 @@ namespace ikk
 
 export [[nodiscard]] inline constexpr ikk::Pixel operator""_px(unsigned long long value) noexcept
 {
-    return ikk::Pixel{ .value = static_cast<std::uint32_t>(value) };
+    return ikk::Pixel{ .value = static_cast<ikk::Pixel::Type>(value) };
 }
 
 export [[nodiscard]] inline constexpr ikk::Percentage operator""_p(long double value) noexcept

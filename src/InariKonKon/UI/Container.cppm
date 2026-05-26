@@ -1,12 +1,11 @@
 module;
 
-#include <ranges>
 #include <vector>
+#include <ranges>
 #include <array>
 
-export module Container;
+export module UI:Container;
 
-import UIBase;
 import Layout;
 import Extent;
 import Theme;
@@ -14,38 +13,77 @@ import Rect;
 
 export namespace ikk
 {
-    class Container
+    class UIElement;
+
+    class Container final
     {
     public:
-        void setChild(UIBase* child) noexcept;
+        explicit Container(Rectf bound) noexcept;
+
+        Container(const Container&) noexcept = default;
+        Container(Container&&) noexcept = default;
+
+        Container& operator=(const Container&) noexcept = default;
+        Container& operator=(Container&&) noexcept = default;
+
+        ~Container() noexcept = default;
+
+        void resize(Rectf newBound) noexcept;
+
+        [[nodiscard]] const Rectf& getBound() const noexcept;
+        [[nodiscard]] Rectf getContentArea() const noexcept;
     private:
-        Rectu m_rect = {};
+        Rectf m_bound = {};
         Theme m_theme = {};
         Layout m_layout = {};
-        std::vector<UIBase*> m_children = {};
         std::array<float, 4> m_paddings = {};
         std::array<float, 4> m_margins = {};
+
+        std::vector<UIElement*> m_children = {};
+
+        void addChild(UIElement& child) noexcept;
+        void removeChild(UIElement& child) noexcept;
+
+        friend UIElement;
     };
 }
 
 namespace ikk
 {
-    void Container::setChild(UIBase* child) noexcept
+    Container::Container(Rectf bound) noexcept
+        : m_bound(bound)
     {
-        if (std::ranges::find(this->m_children, child) == this->m_children.end())
-            this->m_children.emplace_back(child);
-        //TODO:
-        //Report error...
+    }
+
+    void Container::resize(Rectf newBound) noexcept
+    {
+        this->m_bound = newBound;
+    }
+
+    const Rectf& Container::getBound() const noexcept
+    {
+        return this->m_bound;
+    }
+
+    Rectf Container::getContentArea() const noexcept
+    {
+        Rectf contentArea = this->m_bound;
+        contentArea.getTop()    += this->m_paddings.at(0);
+        contentArea.getWidth()  -= this->m_paddings.at(1);
+        contentArea.getHeight() -= this->m_paddings.at(2);
+        contentArea.getLeft()   += this->m_paddings.at(3);
+        return contentArea;
+    }
+
+    void Container::addChild(UIElement& child) noexcept
+    {
+        if (std::ranges::find(this->m_children, &child) == this->m_children.end())
+            this->m_children.emplace_back(&child);
+    }
+
+    void Container::removeChild(UIElement& child) noexcept
+    {
+        if (const auto it = std::ranges::find(this->m_children, &child); it != this->m_children.end())
+            this->m_children.erase(it);
     }
 }
-
-//Does not need to call .draw(), just create it, if you don't want to draw it --> .disable() it
-// (?) .setPanel(&panel) if you want to set a specific panel and ignore the default panel (the main window).
-
-// UI element size & position stuff:
-// - Margin  (between every object)
-// - Padding (between border & contnent) (?)
-// - Array 4 becouse left, right, top, bottom...
-//
-// Set per panel ---> Can only have 1 per panel & can't change mid calculation
-// Panels are just "sub-windows"

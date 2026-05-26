@@ -11,11 +11,7 @@ import :EventManager;
 import :Renderer;
 import :Window;
 
-//TODO: Something with these...
-import TransformComponent;
-import UIComponent;
 import UISystem;
-import ECS;
 
 import Print;
 import Clock;
@@ -46,7 +42,7 @@ export namespace ikk
         Clock m_deltaTime;
         SceneManager m_sceneManager;
 
-        void processEvents() const noexcept;
+        void processEvents() noexcept;
         void update() noexcept;
         void render() const noexcept;
     };
@@ -77,14 +73,19 @@ namespace ikk
         this->m_sceneManager.emplace<T>(std::forward<Args>(args)...);
     }
 
-    void Application::processEvents() const noexcept
+    void Application::processEvents() noexcept
     {
         this->m_window.pollEvents();
         while (eventManager.isEmpty() == false)
         {
             const Event& event = eventManager.top();
+
             for (const std::shared_ptr<Scene>& scene : this->m_sceneManager.getActiveScenes())
                 scene->onEvent(event);
+
+            if (event.is<WindowEvent::Resized>() == true)
+                this->m_window.onResize(event.get<WindowEvent::Resized>()->width, event.get<WindowEvent::Resized>()->height);
+
             eventManager.pop();
         }
     }
@@ -95,14 +96,8 @@ namespace ikk
         for (const std::shared_ptr<Scene>& scene : this->m_sceneManager.getActiveScenes())
             scene->onUpdate(dt);
 
-        //TODO:
-        UISystem::update([](const Entity& entity, const Transform2D& transform, const UI& uiComponent) noexcept
-            {
-                if (transform.isDisabled() == true || uiComponent.isDisabled() == true) return;
-
-                Print("Mouse pos:\n\tx: {}\n\ty: {}", Mouse::getPosition().x(), Mouse::getPosition().y());
-                Print("Mouse wheel factors:\n\tx: {}\n\ty: {}", Mouse::getWheelPosition(Mouse::Wheel::Horizontal), Mouse::getWheelPosition(Mouse::Wheel::Vertical));
-            });
+        //TODO: (?)
+        UISystem::update(this->m_window.m_defaultContainer);
     }
 
     void Application::render() const noexcept
